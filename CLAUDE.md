@@ -6,9 +6,9 @@
 
 ## Current plan
 
-**Active:** `plans/plan-00-bootstrap.md`
+**Active:** `plans/plan-01-auth.md`
 **Status:** Not started
-**Next:** `plans/plan-01-auth.md`
+**Previous:** `plans/plan-00-bootstrap.md` — Complete
 
 Update this section at the start of each plan. It is the first thing every agent session reads.
 
