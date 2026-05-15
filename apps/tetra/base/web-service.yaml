@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tetra-web-service
+spec:
+  selector:
+    app: tetra-web
+  ports:
+    - port: 3000
+      targetPort: 3000

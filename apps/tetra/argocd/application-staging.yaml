@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tetra-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/tetramobile/tetra-gitops.git
+    targetRevision: main
+    path: apps/tetra/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tetra-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
