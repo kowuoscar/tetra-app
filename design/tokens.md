@@ -1,0 +1,346 @@
+# Design tokens
+
+Stack: Next.js + Tailwind CSS + shadcn/ui. Tokens are defined as CSS custom properties in `src/styles/globals.css` and referenced in `tailwind.config.ts`.
+
+---
+
+## CSS custom properties
+
+Paste into `src/styles/globals.css`:
+
+```css
+:root {
+  /* ─── Primitive palette — indigo ─────────────────── */
+  --color-indigo-50:  #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+  --color-indigo-950: #1e1b4b;
+
+  /* ─── Primitive palette — slate (neutral) ────────── */
+  --color-slate-50:  #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* ─── Primitive palette — semantic ───────────────── */
+  --color-green-50:  #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+
+  --color-amber-50:  #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+
+  --color-red-50:  #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  --color-blue-50:  #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  /* ─── Semantic aliases — light mode ──────────────── */
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary:  #f1f5f9;
+  --color-surface:              #ffffff;
+  --color-border:               #e2e8f0;
+  --color-border-strong:        #cbd5e1;
+  --color-text-primary:         #0f172a;
+  --color-text-secondary:       #475569;
+  --color-text-disabled:        #94a3b8;
+  --color-brand-primary:        #4f46e5;
+  --color-brand-hover:          #4338ca;
+  --color-brand-secondary:      #eef2ff;
+  --color-status-success:       #16a34a;
+  --color-status-success-bg:    #f0fdf4;
+  --color-status-warning:       #d97706;
+  --color-status-warning-bg:    #fffbeb;
+  --color-status-error:         #dc2626;
+  --color-status-error-bg:      #fef2f2;
+  --color-status-info:          #2563eb;
+  --color-status-info-bg:       #eff6ff;
+
+  /* ─── Typography ─────────────────────────────────── */
+  --font-family-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+
+  --font-size-xs:  0.75rem;   /* 12px */
+  --font-size-sm:  0.875rem;  /* 14px */
+  --font-size-md:  1rem;      /* 16px */
+  --font-size-lg:  1.125rem;  /* 18px */
+  --font-size-xl:  1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-tight:   1.25;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.75;
+
+  --letter-spacing-tight:  -0.025em;
+  --letter-spacing-normal:  0em;
+  --letter-spacing-wide:    0.025em;
+
+  /* ─── Spacing ────────────────────────────────────── */
+  --space-0:  0px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ─── Border radius ──────────────────────────────── */
+  --radius-none: 0px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ────────────────────────────────────── */
+  --shadow-none: none;
+  --shadow-sm:   0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.10), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+
+  /* ─── Z-index ────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+
+  /* ─── Animation ──────────────────────────────────── */
+  --duration-fast:   100ms;
+  --duration-normal: 200ms;
+  --duration-slow:   300ms;
+  --easing-default:  cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in:       cubic-bezier(0.4, 0, 1, 1);
+  --easing-out:      cubic-bezier(0, 0, 0.2, 1);
+
+  /* ─── Icon sizes ─────────────────────────────────── */
+  --icon-xs: 12px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+
+  /* ─── Breakpoints (reference — use in Tailwind config) */
+  --breakpoint-sm:  640px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg:  1024px;
+  --breakpoint-xl:  1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* ─── Semantic aliases — dark mode ───────────────────── */
+[data-theme="dark"] {
+  --color-background-primary:   #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-background-tertiary:  #334155;
+  --color-surface:              #1e293b;
+  --color-border:               #334155;
+  --color-border-strong:        #475569;
+  --color-text-primary:         #f8fafc;
+  --color-text-secondary:       #94a3b8;
+  --color-text-disabled:        #475569;
+  --color-brand-primary:        #818cf8;
+  --color-brand-hover:          #a5b4fc;
+  --color-brand-secondary:      #1e1b4b;
+  --color-status-success:       #4ade80;
+  --color-status-success-bg:    #052e16;
+  --color-status-warning:       #fcd34d;
+  --color-status-warning-bg:    #292524;
+  --color-status-error:         #f87171;
+  --color-status-error-bg:      #2d0a0a;
+  --color-status-info:          #60a5fa;
+  --color-status-info-bg:       #0c1a3a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-background-primary:   #0f172a;
+    --color-background-secondary: #1e293b;
+    --color-background-tertiary:  #334155;
+    --color-surface:              #1e293b;
+    --color-border:               #334155;
+    --color-border-strong:        #475569;
+    --color-text-primary:         #f8fafc;
+    --color-text-secondary:       #94a3b8;
+    --color-text-disabled:        #475569;
+    --color-brand-primary:        #818cf8;
+    --color-brand-hover:          #a5b4fc;
+    --color-brand-secondary:      #1e1b4b;
+    --color-status-success:       #4ade80;
+    --color-status-success-bg:    #052e16;
+    --color-status-warning:       #fcd34d;
+    --color-status-warning-bg:    #292524;
+    --color-status-error:         #f87171;
+    --color-status-error-bg:      #2d0a0a;
+    --color-status-info:          #60a5fa;
+    --color-status-info-bg:       #0c1a3a;
+  }
+}
+```
+
+---
+
+## Tailwind config extension
+
+Paste into `tailwind.config.ts`:
+
+```typescript
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  darkMode: ['selector', '[data-theme="dark"]'],
+  content: ['./src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary:   'var(--color-brand-primary)',
+          hover:     'var(--color-brand-hover)',
+          secondary: 'var(--color-brand-secondary)',
+        },
+        bg: {
+          primary:   'var(--color-background-primary)',
+          secondary: 'var(--color-background-secondary)',
+          tertiary:  'var(--color-background-tertiary)',
+        },
+        surface:  'var(--color-surface)',
+        border: {
+          DEFAULT: 'var(--color-border)',
+          strong:  'var(--color-border-strong)',
+        },
+        text: {
+          primary:   'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          disabled:  'var(--color-text-disabled)',
+        },
+        status: {
+          success:    'var(--color-status-success)',
+          successBg:  'var(--color-status-success-bg)',
+          warning:    'var(--color-status-warning)',
+          warningBg:  'var(--color-status-warning-bg)',
+          error:      'var(--color-status-error)',
+          errorBg:    'var(--color-status-error-bg)',
+          info:       'var(--color-status-info)',
+          infoBg:     'var(--color-status-info-bg)',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['ui-monospace', 'Cascadia Code', 'Source Code Pro', 'Menlo', 'Consolas', 'monospace'],
+      },
+      fontSize: {
+        xs:  ['0.75rem',  { lineHeight: '1.25' }],
+        sm:  ['0.875rem', { lineHeight: '1.5'  }],
+        md:  ['1rem',     { lineHeight: '1.5'  }],
+        lg:  ['1.125rem', { lineHeight: '1.5'  }],
+        xl:  ['1.25rem',  { lineHeight: '1.25' }],
+        '2xl': ['1.5rem',   { lineHeight: '1.25' }],
+        '3xl': ['1.875rem', { lineHeight: '1.25' }],
+        '4xl': ['2.25rem',  { lineHeight: '1.25' }],
+      },
+      spacing: {
+        '0':  '0px',
+        '1':  '4px',
+        '2':  '8px',
+        '3':  '12px',
+        '4':  '16px',
+        '5':  '20px',
+        '6':  '24px',
+        '8':  '32px',
+        '10': '40px',
+        '12': '48px',
+        '16': '64px',
+        '20': '80px',
+        '24': '96px',
+      },
+      borderRadius: {
+        none: '0px',
+        sm:   '4px',
+        md:   '6px',
+        lg:   '8px',
+        xl:   '12px',
+        full: '9999px',
+      },
+      boxShadow: {
+        none: 'none',
+        sm:   '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        md:   '0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+        lg:   '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+        xl:   '0 20px 25px -5px rgb(0 0 0 / 0.10), 0 8px 10px -6px rgb(0 0 0 / 0.05)',
+      },
+      transitionDuration: {
+        fast:   '100ms',
+        normal: '200ms',
+        slow:   '300ms',
+      },
+      transitionTimingFunction: {
+        default: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        in:      'cubic-bezier(0.4, 0, 1, 1)',
+        out:     'cubic-bezier(0, 0, 0.2, 1)',
+      },
+      screens: {
+        sm:  '640px',
+        md:  '768px',
+        lg:  '1024px',
+        xl:  '1280px',
+        '2xl': '1536px',
+      },
+      zIndex: {
+        base:     '0',
+        raised:   '10',
+        dropdown: '100',
+        sticky:   '200',
+        overlay:  '300',
+        modal:    '400',
+        toast:    '500',
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
+```
