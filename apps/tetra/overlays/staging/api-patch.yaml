@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetra-api
+spec:
+  replicas: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tetra-api-config
+data:
+  SPRING_PROFILES_ACTIVE: "staging"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://tetra-postgres-service:5432/tetra"
+  SPRING_DATASOURCE_USERNAME: "tetra"
+  MINIO_ENDPOINT: "http://tetra-minio-service:9000"
+  MINIO_BUCKET: "tetra-staging-attachments"

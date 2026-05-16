@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tetra-staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tetra-production

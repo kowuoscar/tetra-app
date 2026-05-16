@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetra-web
+spec:
+  replicas: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tetra-web-config
+data:
+  NEXT_PUBLIC_API_URL: "https://staging.tetra.tetramobile.ae"

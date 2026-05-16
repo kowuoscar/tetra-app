@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: tetra-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tetra}
+    username: ${SPRING_DATASOURCE_USERNAME:tetra}
+    password: ${SPRING_DATASOURCE_PASSWORD:tetra}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  port: 8080

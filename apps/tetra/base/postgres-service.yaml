@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tetra-postgres-service
+spec:
+  selector:
+    app: tetra-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+  clusterIP: None

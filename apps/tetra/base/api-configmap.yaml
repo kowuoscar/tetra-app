@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tetra-api-config
+data:
+  SPRING_PROFILES_ACTIVE: ""
+  SPRING_DATASOURCE_URL: ""
+  SPRING_DATASOURCE_USERNAME: ""
+  MINIO_ENDPOINT: ""
+  MINIO_BUCKET: ""
