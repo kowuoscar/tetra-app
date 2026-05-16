@@ -42,7 +42,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
       - run: cd web && pnpm install --frozen-lockfile
-      - run: cd web && pnpm test --passWithNoTests
+      - run: cd web && pnpm test
 
   lint-backend:
     name: Lint Backend

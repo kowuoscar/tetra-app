@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: cd web && pnpm install --frozen-lockfile
       - name: Test
-        run: cd web && pnpm test --passWithNoTests
+        run: cd web && pnpm test
 
   lint-backend:
     name: Lint Backend
