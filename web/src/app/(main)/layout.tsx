@@ -1,15 +1,22 @@
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+import { redirect } from 'next/navigation'
+import { getMe } from '@/lib/data/auth'
+import { AuthHydrator } from '@/components/providers/AuthHydrator'
+
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  const user = await getMe()
+  if (!user) redirect('/login')
+
   return (
-    <div className="flex h-screen bg-bg-secondary">
-      {/* Sidebar — wired in plan-01 auth */}
-      <aside className="w-64 bg-surface border-r border-border flex-shrink-0" />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar — wired in plan-01 auth */}
-        <header className="h-16 bg-surface border-b border-border flex-shrink-0" />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+    <AuthHydrator user={user}>
+      <div className="flex h-screen bg-bg-secondary">
+        <aside className="w-64 bg-surface border-r border-border flex-shrink-0" />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <header className="h-16 bg-surface border-b border-border flex-shrink-0" />
+          <main className="flex-1 overflow-y-auto p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </AuthHydrator>
   )
 }
