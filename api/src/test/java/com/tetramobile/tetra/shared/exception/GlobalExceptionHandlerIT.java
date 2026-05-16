@@ -1,6 +1,7 @@
 package com.tetramobile.tetra.shared.exception;
 
 import com.tetramobile.tetra.auth.AuthService;
+import com.tetramobile.tetra.customer.CustomerService;
 import com.tetramobile.tetra.shared.security.JwtTokenProvider;
 import com.tetramobile.tetra.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class GlobalExceptionHandlerIT {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private CustomerService customerService;
 
     @Autowired
     private MockMvc mockMvc;
