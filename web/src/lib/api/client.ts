@@ -10,10 +10,11 @@ export async function apiClient<T>(
     ...options,
   })
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ code: 'unknown_error' }))
-    throw Object.assign(new Error(error.message ?? 'Request failed'), {
+    const body = await res.json().catch(() => ({}))
+    const errorObj = body.error ?? body
+    throw Object.assign(new Error(errorObj.message ?? 'Request failed'), {
       status: res.status,
-      code: error.code,
+      code: errorObj.code ?? 'unknown_error',
     })
   }
   return res.json() as Promise<T>
