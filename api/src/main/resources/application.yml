@@ -25,5 +25,8 @@ management:
     health:
       show-details: always
 
+jwt:
+  secret: ${JWT_SECRET:test-only-default-secret-key-minimum-32-chars}
+
 server:
   port: 8080
