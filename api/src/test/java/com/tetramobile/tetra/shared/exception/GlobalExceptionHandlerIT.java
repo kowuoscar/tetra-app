@@ -2,7 +2,9 @@ package com.tetramobile.tetra.shared.exception;
 
 import com.tetramobile.tetra.auth.AuthService;
 import com.tetramobile.tetra.customer.CustomerService;
+import com.tetramobile.tetra.phone.PhoneService;
 import com.tetramobile.tetra.shared.security.JwtTokenProvider;
+import com.tetramobile.tetra.simcard.SimCardService;
 import com.tetramobile.tetra.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,12 @@ class GlobalExceptionHandlerIT {
 
     @MockBean
     private CustomerService customerService;
+
+    @MockBean
+    private PhoneService phoneService;
+
+    @MockBean
+    private SimCardService simCardService;
 
     @Autowired
     private MockMvc mockMvc;
