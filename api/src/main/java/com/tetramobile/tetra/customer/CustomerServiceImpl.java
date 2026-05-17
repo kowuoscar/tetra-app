@@ -70,9 +70,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public CostBreakdownResponse getCostBreakdown(UUID customerId, int month, int year) {
+    public CostBreakdownResponse getCostBreakdown(UUID customerId, int month, int year, AuthenticatedUser caller) {
         if (!customerRepository.existsById(customerId)) {
             throw new NotFoundException("Customer not found");
+        }
+        if (caller.isCustomer() && !customerId.equals(caller.customerId())) {
+            throw new ForbiddenException("forbidden", "Access denied");
         }
         return customerQueryRepository.getCostBreakdown(customerId, month, year);
     }

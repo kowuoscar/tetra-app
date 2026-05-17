@@ -2,6 +2,7 @@ package com.tetramobile.tetra.shared.exception;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,15 @@ public class GlobalExceptionHandler {
         Map<String, String> details = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(e -> details.put(e.getField(), e.getDefaultMessage()));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of("validation_error", "Validation failed", details));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        Map<String, String> details = new LinkedHashMap<>();
+        ex.getConstraintViolations()
+                .forEach(v -> details.put(String.valueOf(v.getPropertyPath()), v.getMessage()));
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ErrorResponse.of("validation_error", "Validation failed", details));
     }

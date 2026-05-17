@@ -21,5 +21,5 @@ public interface CustomerService {
 
     PagedResponse<CustomerSummaryResponse> listCustomers(String search, Pageable pageable);
 
-    CostBreakdownResponse getCostBreakdown(UUID customerId, int month, int year);
+    CostBreakdownResponse getCostBreakdown(UUID customerId, int month, int year, AuthenticatedUser caller);
 }

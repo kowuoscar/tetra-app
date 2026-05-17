@@ -71,9 +71,6 @@ public class CustomerController {
             throw new UnprocessableEntityException("missing_period", "month and year are required");
         }
         AuthenticatedUser caller = SecurityUtils.currentUser();
-        if (caller.isCustomer() && !id.equals(caller.customerId())) {
-            throw new ForbiddenException("forbidden", "Access denied");
-        }
-        return ResponseEntity.ok(customerService.getCostBreakdown(id, month, year));
+        return ResponseEntity.ok(customerService.getCostBreakdown(id, month, year, caller));
     }
 }
