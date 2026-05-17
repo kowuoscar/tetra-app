@@ -26,7 +26,7 @@ public class Customer {
     @Column(name = "whatsapp_group_id")
     private String whatsappGroupId;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @PrePersist

@@ -65,8 +65,8 @@ class CustomerControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "name", name,
-                                "contactInfo", "contact@example.com",
-                                "whatsappGroupId", "whatsapp-group-123"
+                                "contact_info", "contact@example.com",
+                                "whatsapp_group_id", "whatsapp-group-123"
                         ))))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
@@ -79,19 +79,19 @@ class CustomerControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "name", "Acme Corp",
-                                "contactInfo", "acme@example.com",
-                                "whatsappGroupId", "group-acme-001"
+                                "contact_info", "acme@example.com",
+                                "whatsapp_group_id", "group-acme-001"
                         ))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.name").value("Acme Corp"))
-                .andExpect(jsonPath("$.contactInfo").value("acme@example.com"))
-                .andExpect(jsonPath("$.whatsappGroupId").value("group-acme-001"))
-                .andExpect(jsonPath("$.phoneCount").value(0))
-                .andExpect(jsonPath("$.simCardCount").value(0))
-                .andExpect(jsonPath("$.openRequestCount").value(0))
-                .andExpect(jsonPath("$.currentMonthCost").value(0))
-                .andExpect(jsonPath("$.createdAt").isString());
+                .andExpect(jsonPath("$.contact_info").value("acme@example.com"))
+                .andExpect(jsonPath("$.whatsapp_group_id").value("group-acme-001"))
+                .andExpect(jsonPath("$.phone_count").value(0))
+                .andExpect(jsonPath("$.sim_card_count").value(0))
+                .andExpect(jsonPath("$.open_request_count").value(0))
+                .andExpect(jsonPath("$.current_month_cost").value(0))
+                .andExpect(jsonPath("$.created_at").isString());
     }
 
     @Test
@@ -101,8 +101,8 @@ class CustomerControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "name", "Should Fail",
-                                "contactInfo", "fail@example.com",
-                                "whatsappGroupId", "group-fail"
+                                "contact_info", "fail@example.com",
+                                "whatsapp_group_id", "group-fail"
                         ))))
                 .andExpect(status().isForbidden());
     }
@@ -161,8 +161,8 @@ class CustomerControllerIT {
                         .content(objectMapper.writeValueAsString(Map.of("name", "Updated Name"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Name"))
-                .andExpect(jsonPath("$.contactInfo").value("contact@example.com"))
-                .andExpect(jsonPath("$.whatsappGroupId").value("whatsapp-group-123"));
+                .andExpect(jsonPath("$.contact_info").value("contact@example.com"))
+                .andExpect(jsonPath("$.whatsapp_group_id").value("whatsapp-group-123"));
     }
 
     @Test
