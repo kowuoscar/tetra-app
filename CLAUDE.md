@@ -6,9 +6,9 @@
 
 ## Current plan
 
-**Active:** `plans/plan-02-customers-assets.md`
+**Active:** `plans/plan-03-requests.md`
 **Status:** Not started
-**Previous:** `plans/plan-01-auth.md` — Complete
+**Previous:** `plans/plan-02-customers-assets.md` — Complete
 
 Update this section at the start of each plan. It is the first thing every agent session reads.
 
@@ -171,4 +171,10 @@ tetra-app/
 
 ## Deferred decisions
 
-No deferred decisions.
+| Decision | Plan | Before | Impact |
+|----------|------|--------|--------|
+| PR #3 minor: `fetchCount` wraps full correlated-subquery SELECT — doubles DB work on customer list pagination | Plan 02 | Plan 05 | Negligible at current scale; optimise if list grows large |
+| PR #3 minor: `CustomerQueryRepository` uses string literals for enum comparisons (`.ne("replaced")`) — typed enums not possible with VARCHAR+CHECK columns | Plan 02 | — | Intentional, correct for schema design; no action needed |
+| PR #3 minor: `PhoneController`/`SimCardController` use `/api/v1` base mapping vs `/api/v1/customers` in `CustomerController` — style inconsistency | Plan 02 | Plan 03 | Readability only; no functional impact |
+| PR #3 minor: `jooq-schema.sql` lacks explicit warning that it is H2-only DDL diverging from V1 migration | Plan 02 | Plan 03 | Could confuse new devs; add comment at top of file |
+| PR #3 minor: `whatsapp_group_id` required at customer creation — confirm product intent; relax to nullable+PATCH if admins need to set later | Plan 02 | Plan 03 | One-field constraint; backend and frontend currently consistent |
