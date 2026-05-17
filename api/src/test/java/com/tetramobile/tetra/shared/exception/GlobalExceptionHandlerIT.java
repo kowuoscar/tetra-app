@@ -2,6 +2,7 @@ package com.tetramobile.tetra.shared.exception;
 
 import com.tetramobile.tetra.auth.AuthService;
 import com.tetramobile.tetra.customer.CustomerService;
+import com.tetramobile.tetra.dashboard.DashboardService;
 import com.tetramobile.tetra.phone.PhoneService;
 import com.tetramobile.tetra.shared.security.JwtTokenProvider;
 import com.tetramobile.tetra.simcard.SimCardService;
@@ -43,6 +44,9 @@ class GlobalExceptionHandlerIT {
 
     @MockBean
     private SimCardService simCardService;
+
+    @MockBean
+    private DashboardService dashboardService;
 
     @Autowired
     private MockMvc mockMvc;

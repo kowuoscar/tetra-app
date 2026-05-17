@@ -20,4 +20,6 @@ public interface SimCardRepository extends JpaRepository<SimCard, UUID> {
     long countByPhoneIdAndStatusNot(UUID phoneId, SimStatus excluded);
 
     Optional<SimCard> findFirstByPhoneIdAndStatusNot(UUID phoneId, SimStatus excluded);
+
+    long countByStatusNot(SimStatus status);
 }
