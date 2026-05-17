@@ -31,4 +31,23 @@ public record CustomerDetailResponse(
                 c.getCreatedAt()
         );
     }
+
+    public static CustomerDetailResponse from(
+            Customer c,
+            int phoneCount,
+            int simCardCount,
+            int openRequestCount,
+            BigDecimal currentMonthCost) {
+        return new CustomerDetailResponse(
+                c.getId(),
+                c.getName(),
+                c.getContactInfo(),
+                c.getWhatsappGroupId(),
+                phoneCount,
+                simCardCount,
+                openRequestCount,
+                currentMonthCost,
+                c.getCreatedAt()
+        );
+    }
 }

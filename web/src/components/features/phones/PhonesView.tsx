@@ -61,7 +61,7 @@ export function PhonesView({ customerId }: { customerId: string }) {
           </div>
 
           {phone.is_unused && (
-            <div className="bg-status-warningBg border border-amber-200 rounded-md px-3 py-2 text-xs text-status-warning">
+            <div className="bg-status-warningBg border border-status-warningBg rounded-md px-3 py-2 text-xs text-status-warning">
               No SIM card assigned
             </div>
           )}

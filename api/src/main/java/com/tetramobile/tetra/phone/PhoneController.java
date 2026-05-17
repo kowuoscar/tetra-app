@@ -41,7 +41,7 @@ public class PhoneController {
     @PatchMapping("/phones/{id}")
     public ResponseEntity<PhoneSummaryResponse> updatePhone(
             @PathVariable UUID id,
-            @RequestBody UpdatePhoneRequest request) {
+            @Valid @RequestBody UpdatePhoneRequest request) {
         SecurityUtils.requireAdmin();
         return ResponseEntity.ok(phoneService.updatePhone(id, request));
     }

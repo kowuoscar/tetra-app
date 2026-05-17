@@ -12,6 +12,7 @@ import com.tetramobile.tetra.shared.security.AuthenticatedUser;
 import com.tetramobile.tetra.shared.security.SecurityUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,8 +65,8 @@ public class CustomerController {
     @GetMapping("/{id}/cost-breakdown")
     public ResponseEntity<CostBreakdownResponse> costBreakdown(
             @PathVariable UUID id,
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year) {
+            @RequestParam(required = false) @Min(1) @Max(12) Integer month,
+            @RequestParam(required = false) @Min(1900) Integer year) {
         if (month == null || year == null) {
             throw new UnprocessableEntityException("missing_period", "month and year are required");
         }
