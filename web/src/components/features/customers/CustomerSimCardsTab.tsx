@@ -3,28 +3,28 @@
 import { useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/lib/stores/authStore'
-import { getCustomerPhones, createPhone } from '@/lib/data/customers'
+import { getCustomerSimCards, createSimCard } from '@/lib/data/customers'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { PhoneSummary } from '@/types'
+import type { SimCardSummary } from '@/types'
 
-const STATUS_CLASSES: Record<PhoneSummary['status'], string> = {
+const STATUS_CLASSES: Record<SimCardSummary['status'], string> = {
   active: 'bg-status-successBg text-status-success',
-  in_repair: 'bg-status-warningBg text-status-warning',
-  replaced: 'bg-bg-tertiary text-text-secondary',
+  unassigned: 'bg-bg-tertiary text-text-secondary',
+  cancelled: 'bg-bg-tertiary text-text-secondary',
 }
 
-export function CustomerPhonesTab({ customerId }: { customerId: string }) {
+export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
   const [showCreate, setShowCreate] = useState(false)
 
   const { data, refetch, isLoading } = useQuery({
-    queryKey: ['phones', customerId],
-    queryFn: () => getCustomerPhones(customerId),
+    queryKey: ['sim-cards', customerId],
+    queryFn: () => getCustomerSimCards(customerId),
   })
 
   if (isLoading) {
@@ -36,40 +36,39 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
       {isAdmin && (
         <div className="flex justify-end">
           <Button size="sm" onClick={() => setShowCreate(true)}>
-            Add Phone
+            Add SIM
           </Button>
         </div>
       )}
 
-      {data?.phones.length === 0 && (
-        <p className="text-text-secondary text-sm">No phones assigned.</p>
+      {data?.sim_cards.length === 0 && (
+        <p className="text-text-secondary text-sm">No SIM cards assigned.</p>
       )}
 
       <div className="space-y-2">
-        {data?.phones.map((phone) => (
+        {data?.sim_cards.map((sim) => (
           <div
-            key={phone.id}
+            key={sim.id}
             className="flex items-center gap-3 bg-surface border border-border rounded-lg px-4 py-3"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary truncate">{phone.model}</p>
-              <p className="text-xs text-text-secondary capitalize">{phone.ownership}</p>
+              <p className="text-sm font-medium text-text-primary capitalize">{sim.type}</p>
+              <p className="text-xs text-text-secondary font-mono">
+                €{sim.base_monthly_fee.toFixed(2)}/mo
+              </p>
             </div>
-            <Badge className={STATUS_CLASSES[phone.status]}>
-              {phone.status.replace('_', ' ')}
+            <Badge className={STATUS_CLASSES[sim.status]}>
+              {sim.status.replace('_', ' ')}
             </Badge>
-            {phone.is_unused && (
-              <Badge className="bg-status-warningBg text-status-warning">No SIM</Badge>
-            )}
-            {phone.sim_card && (
-              <span className="text-xs text-text-secondary">{phone.sim_card.type}</span>
+            {sim.is_unused && (
+              <Badge className="bg-status-warningBg text-status-warning">No phone</Badge>
             )}
           </div>
         ))}
       </div>
 
       {showCreate && isAdmin && (
-        <CreatePhoneModal
+        <CreateSimCardModal
           customerId={customerId}
           onClose={() => setShowCreate(false)}
           onCreated={() => {
@@ -82,7 +81,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
   )
 }
 
-function CreatePhoneModal({
+function CreateSimCardModal({
   customerId,
   onClose,
   onCreated,
@@ -91,7 +90,7 @@ function CreatePhoneModal({
   onClose: () => void
   onCreated: () => void
 }) {
-  const [ownership, setOwnership] = useState('customer')
+  const [simType, setSimType] = useState('prepaid')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -100,14 +99,18 @@ function CreatePhoneModal({
     setSubmitting(true)
     setError(null)
     const formData = new FormData(e.currentTarget)
+    const feeRaw = formData.get('base_monthly_fee') as string
+    const phoneId = (formData.get('phone_id') as string).trim() || undefined
+
     try {
-      await createPhone(customerId, {
-        model: formData.get('model') as string,
-        ownership,
+      await createSimCard(customerId, {
+        type: simType,
+        base_monthly_fee: parseFloat(feeRaw),
+        phone_id: phoneId,
       })
       onCreated()
     } catch (err: unknown) {
-      setError((err as Error).message ?? 'Failed to add phone')
+      setError((err as Error).message ?? 'Failed to add SIM card')
       setSubmitting(false)
     }
   }
@@ -116,24 +119,41 @@ function CreatePhoneModal({
     <Dialog open onOpenChange={() => onClose()}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Add Phone</DialogTitle>
+          <DialogTitle>Add SIM Card</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-1.5">
-            <Label htmlFor="model">Model</Label>
-            <Input id="model" name="model" required disabled={submitting} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Ownership</Label>
-            <Select value={ownership} onValueChange={(v) => v && setOwnership(v)} disabled={submitting}>
+            <Label>Type</Label>
+            <Select value={simType} onValueChange={(v) => v && setSimType(v)} disabled={submitting}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="company">Company</SelectItem>
+                <SelectItem value="prepaid">Prepaid</SelectItem>
+                <SelectItem value="postpaid">Postpaid</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="base_monthly_fee">Base monthly fee (€)</Label>
+            <Input
+              id="base_monthly_fee"
+              name="base_monthly_fee"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              disabled={submitting}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="phone_id">Phone ID (optional)</Label>
+            <Input
+              id="phone_id"
+              name="phone_id"
+              placeholder="UUID of phone to assign"
+              disabled={submitting}
+            />
           </div>
           {error && <p className="text-status-error text-sm">{error}</p>}
           <div className="flex justify-end gap-2">

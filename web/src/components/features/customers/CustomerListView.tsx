@@ -82,7 +82,7 @@ export function CustomerListView() {
                   <td className="px-4 py-3 text-text-secondary">{c.sim_card_count}</td>
                   <td className="px-4 py-3 text-text-secondary">{c.open_request_count}</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    AED {c.current_month_cost.toFixed(2)}
+                    €{c.current_month_cost.toFixed(2)}
                   </td>
                 </tr>
               ))}
