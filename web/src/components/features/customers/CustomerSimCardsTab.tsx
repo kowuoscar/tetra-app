@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { SimCardSummary } from '@/types'
+
+const NATIVE_SELECT_CLS = 'h-8 w-full rounded-lg border border-border bg-surface px-2.5 text-sm text-text-primary cursor-pointer outline-none transition-colors focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/30 disabled:cursor-not-allowed disabled:bg-bg-tertiary disabled:opacity-50'
 
 const STATUS_CLASSES: Record<SimCardSummary['status'], string> = {
   active: 'bg-status-successBg text-status-success',
@@ -156,16 +157,17 @@ function CreateSimCardModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-1.5">
-            <Label>Type</Label>
-            <Select value={simType} onValueChange={(v) => v && setSimType(v)} disabled={submitting}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="prepaid">Prepaid</SelectItem>
-                <SelectItem value="postpaid">Postpaid</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="sim_type">Type</Label>
+            <select
+              id="sim_type"
+              value={simType}
+              onChange={(e) => setSimType(e.target.value)}
+              disabled={submitting}
+              className={NATIVE_SELECT_CLS}
+            >
+              <option value="prepaid">Prepaid</option>
+              <option value="postpaid">Postpaid</option>
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="base_monthly_fee">Base monthly fee (€)</Label>

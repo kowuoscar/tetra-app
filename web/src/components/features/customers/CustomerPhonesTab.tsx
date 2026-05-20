@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { PhoneSummary } from '@/types'
+
+const NATIVE_SELECT_CLS = 'h-8 w-full rounded-lg border border-border bg-surface px-2.5 text-sm text-text-primary cursor-pointer outline-none transition-colors focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/30 disabled:cursor-not-allowed disabled:bg-bg-tertiary disabled:opacity-50'
 
 const STATUS_CLASSES: Record<PhoneSummary['status'], string> = {
   active: 'bg-status-successBg text-status-success',
@@ -158,16 +159,17 @@ function CreatePhoneModal({
             <Input id="model" name="model" required disabled={submitting} />
           </div>
           <div className="space-y-1.5">
-            <Label>Ownership</Label>
-            <Select value={ownership} onValueChange={(v) => v && setOwnership(v)} disabled={submitting}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="company">Company</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="ownership">Ownership</Label>
+            <select
+              id="ownership"
+              value={ownership}
+              onChange={(e) => setOwnership(e.target.value)}
+              disabled={submitting}
+              className={NATIVE_SELECT_CLS}
+            >
+              <option value="customer">Customer</option>
+              <option value="company">Company</option>
+            </select>
           </div>
           {error && <p className="text-status-error text-sm">{error}</p>}
           <div className="flex justify-end gap-2">
