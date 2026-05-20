@@ -25,6 +25,13 @@ export async function getCustomer(id: string): Promise<CustomerDetail> {
   return apiClient(`/customers/${id}`)
 }
 
+export async function updateCustomer(
+  id: string,
+  data: { name?: string; contact_info?: string; whatsapp_group_id?: string },
+): Promise<CustomerDetail> {
+  return apiClient(`/customers/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
 export async function getCustomerPhones(
   id: string,
   includeReplaced = false,
