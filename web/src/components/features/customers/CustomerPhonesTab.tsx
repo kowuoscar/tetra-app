@@ -18,6 +18,9 @@ const STATUS_CLASSES: Record<PhoneSummary['status'], string> = {
   replaced: 'bg-bg-tertiary text-text-secondary',
 }
 
+const TH = 'text-left px-3.5 py-2.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-border bg-bg-secondary whitespace-nowrap'
+const TD = 'px-3.5 py-3 align-middle text-text-primary'
+
 export function CustomerPhonesTab({ customerId }: { customerId: string }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
   const [showCreate, setShowCreate] = useState(false)
@@ -28,44 +31,75 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
   })
 
   if (isLoading) {
-    return <p className="text-text-secondary text-sm mt-4">Loading…</p>
+    return <p className="text-text-secondary text-sm">Loading…</p>
   }
 
   return (
-    <div className="mt-4 space-y-3">
-      {isAdmin && (
-        <div className="flex justify-end">
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            Add Phone
-          </Button>
-        </div>
-      )}
+    <div>
+      <div className="flex items-center justify-between mb-3.5">
+        <span className="text-sm font-semibold text-text-primary">Phones</span>
+        {isAdmin && (
+          <Button size="sm" onClick={() => setShowCreate(true)}>+ Add phone</Button>
+        )}
+      </div>
 
-      {data?.phones.length === 0 && (
-        <p className="text-text-secondary text-sm">No phones assigned.</p>
-      )}
-
-      <div className="space-y-2">
-        {data?.phones.map((phone) => (
-          <div
-            key={phone.id}
-            className="flex items-center gap-3 bg-surface border border-border rounded-lg px-4 py-3"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary truncate">{phone.model}</p>
-              <p className="text-xs text-text-secondary capitalize">{phone.ownership}</p>
-            </div>
-            <Badge className={STATUS_CLASSES[phone.status]}>
-              {phone.status.replace('_', ' ')}
-            </Badge>
-            {phone.is_unused && (
-              <Badge className="bg-status-warningBg text-status-warning">No SIM</Badge>
-            )}
-            {phone.sim_card && (
-              <span className="text-xs text-text-secondary">{phone.sim_card.type}</span>
-            )}
-          </div>
-        ))}
+      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+        {data?.phones.length === 0 ? (
+          <p className="text-text-secondary text-sm p-4">No phones assigned.</p>
+        ) : (
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
+              <tr>
+                <th className={TH}>Model</th>
+                <th className={TH}>Ownership</th>
+                <th className={TH}>SIM Card</th>
+                <th className={TH}>Status</th>
+                <th className={TH}>Flags</th>
+                {isAdmin && <th className={TH}></th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {data?.phones.map((phone) => (
+                <tr key={phone.id} className="hover:bg-bg-secondary">
+                  <td className={TD}>
+                    <span className="text-brand-primary font-medium">{phone.model}</span>
+                  </td>
+                  <td className={`${TD} text-text-secondary capitalize`}>
+                    {phone.ownership}
+                  </td>
+                  <td className={TD}>
+                    {phone.sim_card ? (
+                      <Badge className="bg-brand-secondary text-brand-primary">
+                        {phone.sim_card.type} · €{phone.sim_card.base_monthly_fee.toFixed(2)}/mo
+                      </Badge>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
+                  </td>
+                  <td className={TD}>
+                    <Badge className={STATUS_CLASSES[phone.status]}>
+                      {phone.status.replace('_', ' ')}
+                    </Badge>
+                  </td>
+                  <td className={TD}>
+                    {phone.is_unused ? (
+                      <Badge className="bg-status-warningBg text-status-warning">No SIM</Badge>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
+                  </td>
+                  {isAdmin && (
+                    <td className={`${TD} text-right`}>
+                      <Button variant="ghost" size="sm" className="px-2.5 py-1 text-xs h-auto">
+                        Edit
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {showCreate && isAdmin && (

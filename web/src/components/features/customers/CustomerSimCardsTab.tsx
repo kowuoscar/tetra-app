@@ -18,6 +18,9 @@ const STATUS_CLASSES: Record<SimCardSummary['status'], string> = {
   cancelled: 'bg-bg-tertiary text-text-secondary',
 }
 
+const TH = 'text-left px-3.5 py-2.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-border bg-bg-secondary whitespace-nowrap'
+const TD = 'px-3.5 py-3 align-middle text-text-primary'
+
 export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
   const [showCreate, setShowCreate] = useState(false)
@@ -28,43 +31,73 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
   })
 
   if (isLoading) {
-    return <p className="text-text-secondary text-sm mt-4">Loading…</p>
+    return <p className="text-text-secondary text-sm">Loading…</p>
   }
 
   return (
-    <div className="mt-4 space-y-3">
-      {isAdmin && (
-        <div className="flex justify-end">
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            Add SIM
-          </Button>
-        </div>
-      )}
+    <div>
+      <div className="flex items-center justify-between mb-3.5">
+        <span className="text-sm font-semibold text-text-primary">SIM Cards</span>
+        {isAdmin && (
+          <Button size="sm" onClick={() => setShowCreate(true)}>+ Add SIM</Button>
+        )}
+      </div>
 
-      {data?.sim_cards.length === 0 && (
-        <p className="text-text-secondary text-sm">No SIM cards assigned.</p>
-      )}
-
-      <div className="space-y-2">
-        {data?.sim_cards.map((sim) => (
-          <div
-            key={sim.id}
-            className="flex items-center gap-3 bg-surface border border-border rounded-lg px-4 py-3"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary capitalize">{sim.type}</p>
-              <p className="text-xs text-text-secondary font-mono">
-                €{sim.base_monthly_fee.toFixed(2)}/mo
-              </p>
-            </div>
-            <Badge className={STATUS_CLASSES[sim.status]}>
-              {sim.status.replace('_', ' ')}
-            </Badge>
-            {sim.is_unused && (
-              <Badge className="bg-status-warningBg text-status-warning">No phone</Badge>
-            )}
-          </div>
-        ))}
+      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+        {data?.sim_cards.length === 0 ? (
+          <p className="text-text-secondary text-sm p-4">No SIM cards assigned.</p>
+        ) : (
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
+              <tr>
+                <th className={TH}>Type</th>
+                <th className={TH}>Base Fee</th>
+                <th className={TH}>Phone</th>
+                <th className={TH}>Status</th>
+                <th className={TH}>Flags</th>
+                {isAdmin && <th className={TH}></th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {data?.sim_cards.map((sim) => (
+                <tr key={sim.id} className="hover:bg-bg-secondary">
+                  <td className={`${TD} capitalize`}>
+                    <span className="text-brand-primary font-medium">{sim.type}</span>
+                  </td>
+                  <td className={`${TD} font-mono text-xs text-text-secondary`}>
+                    €{sim.base_monthly_fee.toFixed(2)}/mo
+                  </td>
+                  <td className={TD}>
+                    {sim.phone_id ? (
+                      <Badge className="bg-brand-secondary text-brand-primary">Assigned</Badge>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
+                  </td>
+                  <td className={TD}>
+                    <Badge className={STATUS_CLASSES[sim.status]}>
+                      {sim.status.replace('_', ' ')}
+                    </Badge>
+                  </td>
+                  <td className={TD}>
+                    {sim.is_unused ? (
+                      <Badge className="bg-status-warningBg text-status-warning">No phone</Badge>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
+                  </td>
+                  {isAdmin && (
+                    <td className={`${TD} text-right`}>
+                      <Button variant="ghost" size="sm" className="px-2.5 py-1 text-xs h-auto">
+                        Edit
+                      </Button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {showCreate && isAdmin && (

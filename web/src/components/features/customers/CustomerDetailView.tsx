@@ -1,63 +1,82 @@
 'use client'
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/stores/authStore'
+import { Button } from '@/components/ui/button'
 import { CustomerPhonesTab } from './CustomerPhonesTab'
 import { CustomerSimCardsTab } from './CustomerSimCardsTab'
 import { CustomerCostBreakdownTab } from './CustomerCostBreakdownTab'
 import type { CustomerDetail } from '@/types'
 
+type Tab = 'phones' | 'sims' | 'requests' | 'costs' | 'time'
+
+const ALL_TABS: { id: Tab; label: string; adminOnly?: boolean }[] = [
+  { id: 'phones', label: 'Phones' },
+  { id: 'sims', label: 'SIM Cards' },
+  { id: 'requests', label: 'Requests' },
+  { id: 'costs', label: 'Cost Breakdown' },
+  { id: 'time', label: 'Time Tracking', adminOnly: true },
+]
+
 export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
+  const [activeTab, setActiveTab] = useState<Tab>('phones')
+
+  const tabs = ALL_TABS.filter((t) => !t.adminOnly || isAdmin)
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-text-primary">{customer.name}</h1>
-        <p className="text-sm text-text-secondary mt-1">{customer.contact_info}</p>
-      </div>
-
-      {/* Stats row */}
-      <div className="flex gap-6 text-sm">
-        <span className="text-text-secondary">{customer.phone_count} phones</span>
-        <span className="text-text-secondary">{customer.sim_card_count} SIM cards</span>
-        <span className="text-text-secondary">{customer.open_request_count} open requests</span>
-        <span className="text-text-secondary font-mono">
-          €{customer.current_month_cost.toFixed(2)} this month
-        </span>
-      </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="phones">
-        <TabsList>
-          <TabsTrigger value="phones">Phones</TabsTrigger>
-          <TabsTrigger value="sims">SIM Cards</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger>
-          <TabsTrigger value="costs">Cost Breakdown</TabsTrigger>
-          {isAdmin && <TabsTrigger value="time">Time Tracking</TabsTrigger>}
-        </TabsList>
-
-        <TabsContent value="phones">
-          <CustomerPhonesTab customerId={customer.id} />
-        </TabsContent>
-        <TabsContent value="sims">
-          <CustomerSimCardsTab customerId={customer.id} />
-        </TabsContent>
-        <TabsContent value="requests">
-          <p className="text-text-secondary text-sm mt-4">Requests coming in plan-03.</p>
-        </TabsContent>
-        <TabsContent value="costs">
-          <CustomerCostBreakdownTab customerId={customer.id} />
-        </TabsContent>
+    <div>
+      {/* Header card */}
+      <div className="bg-surface border border-border rounded-lg px-6 py-5 mb-5 flex items-start justify-between">
+        <div>
+          <div className="text-xl font-bold text-text-primary mb-1">{customer.name}</div>
+          <div className="flex flex-wrap gap-4 text-sm text-text-secondary mt-0.5">
+            <span>{customer.contact_info}</span>
+            <span>{customer.phone_count} phones</span>
+            <span>{customer.sim_card_count} SIM cards</span>
+            <span className="text-status-warning">{customer.open_request_count} open requests</span>
+            <span className="text-text-disabled">
+              €{customer.current_month_cost.toFixed(2)}/mo current
+            </span>
+          </div>
+        </div>
         {isAdmin && (
-          <TabsContent value="time">
-            <p className="text-text-secondary text-sm mt-4">
-              Time tracking coming in plan-03.
-            </p>
-          </TabsContent>
+          <div className="flex gap-2 shrink-0 ml-4">
+            <Button variant="outline" size="sm">Edit</Button>
+            <Button size="sm">New request</Button>
+          </div>
         )}
-      </Tabs>
+      </div>
+
+      {/* Tab nav */}
+      <div className="flex border-b border-border mb-5">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors',
+              activeTab === tab.id
+                ? 'text-brand-primary border-brand-primary'
+                : 'text-text-secondary border-transparent hover:text-text-primary',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {activeTab === 'phones' && <CustomerPhonesTab customerId={customer.id} />}
+      {activeTab === 'sims' && <CustomerSimCardsTab customerId={customer.id} />}
+      {activeTab === 'requests' && (
+        <p className="text-text-secondary text-sm">Requests coming in plan-03.</p>
+      )}
+      {activeTab === 'costs' && <CustomerCostBreakdownTab customerId={customer.id} />}
+      {activeTab === 'time' && isAdmin && (
+        <p className="text-text-secondary text-sm">Time tracking coming in plan-03.</p>
+      )}
     </div>
   )
 }
