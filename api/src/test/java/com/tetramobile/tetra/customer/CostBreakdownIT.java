@@ -82,7 +82,9 @@ class CostBreakdownIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", type,
-                                "base_monthly_fee", baseFee
+                                "base_monthly_fee", baseFee,
+                                "provider", "SFR",
+                                "number", "0698765432"
                         ))))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();

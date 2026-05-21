@@ -90,18 +90,13 @@ class PhoneControllerIT {
     }
 
     private void createSimCard(UUID customerId, UUID phoneId) throws Exception {
-        Map<String, Object> body;
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("type", phoneId != null ? "postpaid" : "prepaid");
+        body.put("base_monthly_fee", phoneId != null ? 50.00 : 25.00);
+        body.put("provider", "ORANGE");
+        body.put("number", "0712345678");
         if (phoneId != null) {
-            body = Map.of(
-                    "type", "postpaid",
-                    "base_monthly_fee", 50.00,
-                    "phone_id", phoneId.toString()
-            );
-        } else {
-            body = Map.of(
-                    "type", "prepaid",
-                    "base_monthly_fee", 25.00
-            );
+            body.put("phone_id", phoneId.toString());
         }
         mockMvc.perform(post("/api/v1/customers/" + customerId + "/sim-cards")
                         .cookie(new Cookie("access_token", adminToken))

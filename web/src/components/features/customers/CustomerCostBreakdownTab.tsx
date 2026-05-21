@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getCostBreakdown } from '@/lib/data/customers'
-import { Badge } from '@/components/ui/badge'
+import { StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 function getDefaultPeriod() {
@@ -87,9 +87,9 @@ export function CustomerCostBreakdownTab({ customerId }: { customerId: string })
                         {fee.sim_card_type}
                       </span>
                       {fee.is_actual && (
-                        <Badge className="bg-status-infoBg text-status-info text-xs">
+                        <StatusBadge variant="info" dot={false} className="text-xs">
                           Actual
-                        </Badge>
+                        </StatusBadge>
                       )}
                     </div>
                     <span className="text-sm font-medium text-text-primary font-mono">

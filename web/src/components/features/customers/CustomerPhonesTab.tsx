@@ -3,21 +3,15 @@
 import { useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/lib/stores/authStore'
-import { getCustomerPhones, createPhone } from '@/lib/data/customers'
-import { Badge } from '@/components/ui/badge'
+import { getCustomerPhones, getCustomerSimCards, createPhone, updatePhone, updateSimCard } from '@/lib/data/customers'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { PhoneSummary } from '@/types'
+import { StatusBadge, statusVariant } from '@/components/ui/badge'
+import type { PhoneSummary, SimCardSummary } from '@/types'
 
 const NATIVE_SELECT_CLS = 'h-8 w-full rounded-lg border border-border bg-surface px-2.5 text-sm text-text-primary cursor-pointer outline-none transition-colors focus:border-brand-primary focus:ring-3 focus:ring-brand-primary/30 disabled:cursor-not-allowed disabled:bg-bg-tertiary disabled:opacity-50'
-
-const STATUS_CLASSES: Record<PhoneSummary['status'], string> = {
-  active: 'bg-status-successBg text-status-success',
-  in_repair: 'bg-status-warningBg text-status-warning',
-  replaced: 'bg-bg-tertiary text-text-secondary',
-}
 
 const TH = 'text-left px-3.5 py-2.5 text-[11px] font-semibold text-text-secondary uppercase tracking-wider border-b border-border bg-bg-secondary whitespace-nowrap'
 const TD = 'px-3.5 py-3 align-middle text-text-primary'
@@ -25,6 +19,9 @@ const TD = 'px-3.5 py-3 align-middle text-text-primary'
 export function CustomerPhonesTab({ customerId }: { customerId: string }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
   const [showCreate, setShowCreate] = useState(false)
+  const [editingPhone, setEditingPhone] = useState<PhoneSummary | null>(null)
+  const [assigningPhone, setAssigningPhone] = useState<PhoneSummary | null>(null)
+  const [unassigningSimId, setUnassigningSimId] = useState<string | null>(null)
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['phones', customerId],
@@ -70,30 +67,62 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
                   </td>
                   <td className={TD}>
                     {phone.sim_card ? (
-                      <Badge className="bg-brand-secondary text-brand-primary">
-                        {phone.sim_card.type} · €{phone.sim_card.base_monthly_fee.toFixed(2)}/mo
-                      </Badge>
+                      <StatusBadge variant="brand" dot={false}>
+                        {phone.sim_card.provider && <span className="capitalize">{phone.sim_card.provider.charAt(0) + phone.sim_card.provider.slice(1).toLowerCase()}</span>}
+                        {phone.sim_card.provider && ' · '}
+                        {phone.sim_card.number && <span className="font-mono">{phone.sim_card.number}</span>}
+                        {phone.sim_card.number && ' · '}
+                        <span className="capitalize">{phone.sim_card.type}</span>
+                        {phone.sim_card.type === 'postpaid' && ` · €${phone.sim_card.base_monthly_fee.toFixed(2)}/mo`}
+                      </StatusBadge>
                     ) : (
                       <span className="text-text-secondary">—</span>
                     )}
                   </td>
                   <td className={TD}>
-                    <Badge className={STATUS_CLASSES[phone.status]}>
+                    <StatusBadge variant={statusVariant(phone.status)}>
                       {phone.status.replace('_', ' ')}
-                    </Badge>
+                    </StatusBadge>
                   </td>
                   <td className={TD}>
                     {phone.is_unused ? (
-                      <Badge className="bg-status-warningBg text-status-warning">No SIM</Badge>
+                      <StatusBadge variant="warning">No SIM</StatusBadge>
                     ) : (
                       <span className="text-text-secondary">—</span>
                     )}
                   </td>
                   {isAdmin && (
                     <td className={`${TD} text-right`}>
-                      <Button variant="ghost" size="sm" className="px-2.5 py-1 text-xs h-auto">
-                        Edit
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        {!phone.sim_card && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="px-2.5 py-1 text-xs h-auto"
+                            onClick={() => setAssigningPhone(phone)}
+                          >
+                            Assign SIM
+                          </Button>
+                        )}
+                        {phone.sim_card && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="px-2.5 py-1 text-xs h-auto text-status-error hover:text-status-error"
+                            onClick={() => setUnassigningSimId(phone.sim_card!.id)}
+                          >
+                            Unassign SIM
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="px-2.5 py-1 text-xs h-auto"
+                          onClick={() => setEditingPhone(phone)}
+                        >
+                          Edit
+                        </Button>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -109,6 +138,40 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
           onClose={() => setShowCreate(false)}
           onCreated={() => {
             setShowCreate(false)
+            refetch()
+          }}
+        />
+      )}
+
+      {editingPhone && isAdmin && (
+        <EditPhoneModal
+          phone={editingPhone}
+          onClose={() => setEditingPhone(null)}
+          onSaved={() => {
+            setEditingPhone(null)
+            refetch()
+          }}
+        />
+      )}
+
+      {assigningPhone && isAdmin && (
+        <AssignSimModal
+          customerId={customerId}
+          phone={assigningPhone}
+          onClose={() => setAssigningPhone(null)}
+          onSaved={() => {
+            setAssigningPhone(null)
+            refetch()
+          }}
+        />
+      )}
+
+      {unassigningSimId && isAdmin && (
+        <UnassignSimConfirm
+          simCardId={unassigningSimId}
+          onClose={() => setUnassigningSimId(null)}
+          onDone={() => {
+            setUnassigningSimId(null)
             refetch()
           }}
         />
@@ -181,6 +244,224 @@ function CreatePhoneModal({
             </Button>
           </div>
         </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function EditPhoneModal({
+  phone,
+  onClose,
+  onSaved,
+}: {
+  phone: PhoneSummary
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [ownership, setOwnership] = useState<PhoneSummary['ownership']>(phone.ownership)
+  const [status, setStatus] = useState<PhoneSummary['status']>(phone.status)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setSubmitting(true)
+    setError(null)
+    const formData = new FormData(e.currentTarget)
+    try {
+      await updatePhone(phone.id, {
+        model: formData.get('model') as string,
+        ownership,
+        status,
+      })
+      onSaved()
+    } catch (err: unknown) {
+      setError((err as Error).message ?? 'Failed to update phone')
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Edit Phone</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="edit_model">Model</Label>
+            <Input id="edit_model" name="model" defaultValue={phone.model} required disabled={submitting} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit_ownership">Ownership</Label>
+            <select
+              id="edit_ownership"
+              value={ownership}
+              onChange={(e) => setOwnership(e.target.value as PhoneSummary['ownership'])}
+              disabled={submitting}
+              className={NATIVE_SELECT_CLS}
+            >
+              <option value="customer">Customer</option>
+              <option value="company">Company</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit_status">Status</Label>
+            <select
+              id="edit_status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as PhoneSummary['status'])}
+              disabled={submitting}
+              className={NATIVE_SELECT_CLS}
+            >
+              <option value="active">Active</option>
+              <option value="in_repair">In repair</option>
+            </select>
+          </div>
+          {error && <p className="text-status-error text-sm">{error}</p>}
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? 'Saving…' : 'Save'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function AssignSimModal({
+  customerId,
+  phone,
+  onClose,
+  onSaved,
+}: {
+  customerId: string
+  phone: PhoneSummary
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [selected, setSelected] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['sim-cards-unassigned', customerId],
+    queryFn: () => getCustomerSimCards(customerId),
+  })
+
+  const unassigned = (data?.sim_cards ?? []).filter((s) => s.status === 'unassigned')
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!selected) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      await updateSimCard(selected, { phone_id: phone.id })
+      onSaved()
+    } catch (err: unknown) {
+      setError((err as Error).message ?? 'Failed to assign SIM card')
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Assign SIM Card</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          {isLoading ? (
+            <p className="text-text-secondary text-sm">Loading…</p>
+          ) : unassigned.length === 0 ? (
+            <p className="text-text-secondary text-sm">No unassigned SIM cards available.</p>
+          ) : (
+            <div className="space-y-1 max-h-60 overflow-y-auto">
+              {unassigned.map((sim: SimCardSummary) => (
+                <label
+                  key={sim.id}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border cursor-pointer hover:bg-bg-secondary has-[:checked]:border-brand-primary has-[:checked]:bg-brand-secondary/30"
+                >
+                  <input
+                    type="radio"
+                    name="sim_id"
+                    value={sim.id}
+                    checked={selected === sim.id}
+                    onChange={() => setSelected(sim.id)}
+                    className="accent-brand-primary"
+                  />
+                  <span className="text-sm text-text-primary capitalize">
+                    {sim.provider && <span>{sim.provider.charAt(0) + sim.provider.slice(1).toLowerCase()} · </span>}
+                    {sim.number && <span className="font-mono">{sim.number} · </span>}
+                    {sim.type}
+                    {sim.type === 'postpaid' && ` · €${sim.base_monthly_fee.toFixed(2)}/mo`}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+          {error && <p className="text-status-error text-sm">{error}</p>}
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={submitting || !selected || unassigned.length === 0}>
+              {submitting ? 'Assigning…' : 'Assign'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function UnassignSimConfirm({
+  simCardId,
+  onClose,
+  onDone,
+}: {
+  simCardId: string
+  onClose: () => void
+  onDone: () => void
+}) {
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleConfirm() {
+    setSubmitting(true)
+    setError(null)
+    try {
+      await updateSimCard(simCardId, { phone_id: null })
+      onDone()
+    } catch (err: unknown) {
+      setError((err as Error).message ?? 'Failed to unassign SIM card')
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Unassign SIM Card</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 mt-2">
+          <p className="text-sm text-text-secondary">Remove SIM card assignment from this phone?</p>
+          {error && <p className="text-status-error text-sm">{error}</p>}
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirm} disabled={submitting}>
+              {submitting ? 'Unassigning…' : 'Unassign'}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

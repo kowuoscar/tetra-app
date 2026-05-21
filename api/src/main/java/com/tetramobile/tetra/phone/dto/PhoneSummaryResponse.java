@@ -20,11 +20,12 @@ public record PhoneSummaryResponse(
         Instant createdAt
 ) {
 
-    public record SimInfo(UUID id, String type, BigDecimal baseMonthlyFee) {}
+    public record SimInfo(UUID id, String type, BigDecimal baseMonthlyFee, String provider, String number) {}
 
     public static PhoneSummaryResponse from(Phone phone, SimCard sim, boolean isUnused) {
         SimInfo simInfo = sim != null
-                ? new SimInfo(sim.getId(), sim.getType().name(), sim.getBaseMonthlyFee())
+                ? new SimInfo(sim.getId(), sim.getType().name(), sim.getBaseMonthlyFee(),
+                        sim.getProvider() != null ? sim.getProvider().name() : null, sim.getNumber())
                 : null;
         return new PhoneSummaryResponse(
                 phone.getId(),

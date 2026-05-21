@@ -94,6 +94,8 @@ class SimCardControllerIT {
         Map<String, Object> body = new HashMap<>();
         body.put("type", type);
         body.put("base_monthly_fee", 50.00);
+        body.put("provider", "FREE");
+        body.put("number", "0612345678");
         if (phoneId != null) {
             body.put("phone_id", phoneId.toString());
         }
@@ -119,13 +121,17 @@ class SimCardControllerIT {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", "postpaid",
                                 "base_monthly_fee", 75.00,
-                                "phone_id", phoneId.toString()
+                                "phone_id", phoneId.toString(),
+                                "provider", "FREE",
+                                "number", "0612345678"
                         ))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.type").value("postpaid"))
                 .andExpect(jsonPath("$.status").value("active"))
                 .andExpect(jsonPath("$.phone_id").value(phoneId.toString()))
+                .andExpect(jsonPath("$.provider").value("FREE"))
+                .andExpect(jsonPath("$.number").value("0612345678"))
                 .andExpect(jsonPath("$.is_unused").value(false));
     }
 
@@ -138,7 +144,9 @@ class SimCardControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", "prepaid",
-                                "base_monthly_fee", 30.00
+                                "base_monthly_fee", 30.00,
+                                "provider", "ORANGE",
+                                "number", "0712345678"
                         ))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("unassigned"))
@@ -155,7 +163,9 @@ class SimCardControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", "prepaid",
-                                "base_monthly_fee", 20.00
+                                "base_monthly_fee", 20.00,
+                                "provider", "FREE",
+                                "number", "0612345678"
                         ))))
                 .andExpect(status().isForbidden());
     }
@@ -175,7 +185,9 @@ class SimCardControllerIT {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", "prepaid",
                                 "base_monthly_fee", 25.00,
-                                "phone_id", phoneId.toString()
+                                "phone_id", phoneId.toString(),
+                                "provider", "SFR",
+                                "number", "0634567890"
                         ))))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error.code").value("phone_already_has_sim"));
@@ -194,7 +206,9 @@ class SimCardControllerIT {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", "prepaid",
                                 "base_monthly_fee", 25.00,
-                                "phone_id", phone2Id.toString()
+                                "phone_id", phone2Id.toString(),
+                                "provider", "CORIOLIS",
+                                "number", "0656789012"
                         ))))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error.code").value("phone_belongs_to_different_customer"));
@@ -297,6 +311,73 @@ class SimCardControllerIT {
                                 "actual_amount", 50.00
                         ))))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createSimCard_missingProvider_returns422() throws Exception {
+        UUID customerId = createCustomer();
+
+        mockMvc.perform(post("/api/v1/customers/" + customerId + "/sim-cards")
+                        .cookie(new Cookie("access_token", adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "type", "prepaid",
+                                "base_monthly_fee", 20.00,
+                                "number", "0612345678"
+                        ))))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void createSimCard_missingNumber_returns422() throws Exception {
+        UUID customerId = createCustomer();
+
+        mockMvc.perform(post("/api/v1/customers/" + customerId + "/sim-cards")
+                        .cookie(new Cookie("access_token", adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "type", "prepaid",
+                                "base_monthly_fee", 20.00,
+                                "provider", "FREE"
+                        ))))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void createSimCard_invalidNumberPattern_returns422() throws Exception {
+        UUID customerId = createCustomer();
+
+        mockMvc.perform(post("/api/v1/customers/" + customerId + "/sim-cards")
+                        .cookie(new Cookie("access_token", adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "type", "prepaid",
+                                "base_monthly_fee", 20.00,
+                                "provider", "FREE",
+                                "number", "0512345678"
+                        ))))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void patchSimCard_updateProviderAndNumber_returnsUpdatedFields() throws Exception {
+        UUID customerId = createCustomer();
+        UUID simId = createSimCard(customerId, null, "prepaid");
+
+        Map<String, Object> patchBody = new HashMap<>();
+        patchBody.put("provider", "ORANGE");
+        patchBody.put("number", "0711223344");
+
+        JsonNode response = objectMapper.readTree(
+                mockMvc.perform(patch("/api/v1/sim-cards/" + simId)
+                                .cookie(new Cookie("access_token", adminToken))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(patchBody)))
+                        .andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString());
+
+        assert response.get("provider").asText().equals("ORANGE");
+        assert response.get("number").asText().equals("0711223344");
     }
 
     @Test

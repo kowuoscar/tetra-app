@@ -62,11 +62,11 @@ All errors return this shape:
 
     "CustomerSummary": {
       "type": "object",
-      "required": ["id", "name", "contact_info", "phone_count", "sim_card_count", "open_request_count", "current_month_cost", "created_at"],
+      "required": ["id", "name", "phone_count", "sim_card_count", "open_request_count", "current_month_cost", "created_at"],
       "properties": {
         "id":                  { "type": "string", "format": "uuid" },
         "name":                { "type": "string" },
-        "contact_info":        { "type": "string" },
+        "contact_info":        { "type": ["string", "null"] },
         "phone_count":         { "type": "integer" },
         "sim_card_count":      { "type": "integer" },
         "open_request_count":  { "type": "integer" },
@@ -78,9 +78,8 @@ All errors return this shape:
     "CustomerDetail": {
       "allOf": [{ "$ref": "#/definitions/CustomerSummary" }],
       "properties": {
-        "whatsapp_group_id": { "type": "string" }
-      },
-      "required": ["whatsapp_group_id"]
+        "whatsapp_group_id": { "type": ["string", "null"], "description": "Optional — null until set by admin" }
+      }
     },
 
     "PhoneSummary": {
@@ -97,6 +96,8 @@ All errors return this shape:
           "properties": {
             "id":               { "type": "string", "format": "uuid" },
             "type":             { "type": "string", "enum": ["prepaid", "postpaid"] },
+            "provider":         { "type": ["string", "null"], "enum": ["FREE", "ORANGE", "BOUYGUES", "SFR", "CORIOLIS", null] },
+            "number":           { "type": ["string", "null"] },
             "base_monthly_fee": { "type": "number" }
           }
         },
@@ -111,6 +112,8 @@ All errors return this shape:
       "properties": {
         "id":               { "type": "string", "format": "uuid" },
         "type":             { "type": "string", "enum": ["prepaid", "postpaid"] },
+        "provider":         { "type": ["string", "null"], "enum": ["FREE", "ORANGE", "BOUYGUES", "SFR", "CORIOLIS", null], "description": "SIM provider. Nullable for legacy rows created before this field was added." },
+        "number":           { "type": ["string", "null"], "description": "FR mobile MSISDN. Format: 0[67]\\d{8} or +33[67]\\d{8}. Nullable for legacy rows." },
         "base_monthly_fee": { "type": "number" },
         "status":           { "type": "string", "enum": ["active", "unassigned", "cancelled"] },
         "customer_id":      { "type": "string", "format": "uuid" },
@@ -527,11 +530,11 @@ Sets new `access_token` cookie and rotated `refresh_token` cookie.
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["name", "contact_info", "whatsapp_group_id"],
+  "required": ["name"],
   "properties": {
     "name":               { "type": "string" },
-    "contact_info":       { "type": "string" },
-    "whatsapp_group_id":  { "type": "string" }
+    "contact_info":       { "type": "string", "description": "Optional — can be set later via PATCH" },
+    "whatsapp_group_id":  { "type": "string", "description": "Optional — can be set later via PATCH. Required for WhatsApp notifications to fire." }
   }
 }
 ```
@@ -757,10 +760,12 @@ Sets new `access_token` cookie and rotated `refresh_token` cookie.
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["type", "base_monthly_fee"],
+  "required": ["type", "provider", "number", "base_monthly_fee"],
   "properties": {
     "type":             { "type": "string", "enum": ["prepaid", "postpaid"] },
-    "base_monthly_fee": { "type": "number", "minimum": 0 },
+    "provider":         { "type": "string", "enum": ["FREE", "ORANGE", "BOUYGUES", "SFR", "CORIOLIS"] },
+    "number":           { "type": "string", "description": "FR mobile MSISDN. Accepted formats: 0[67]\\d{8} or +33[67]\\d{8}." },
+    "base_monthly_fee": { "type": "number", "minimum": 0, "description": "Set to 0 for prepaid SIMs — fee field hidden in UI." },
     "phone_id":         { "type": "string", "format": "uuid", "description": "Optional — assigns SIM to a phone at creation" }
   }
 }
@@ -782,7 +787,7 @@ Sets new `access_token` cookie and rotated `refresh_token` cookie.
 
 ### PATCH /sim-cards/{id}
 
-**Description:** Updates a SIM card's assigned phone, base monthly fee, or status.
+**Description:** Updates a SIM card's assigned phone, base monthly fee, status, provider, or number.
 **Auth required:** Yes (admin only)
 **Interaction:** 19 — Admin updates a SIM card
 
@@ -796,7 +801,9 @@ Sets new `access_token` cookie and rotated `refresh_token` cookie.
   "properties": {
     "phone_id":         { "type": ["string", "null"], "format": "uuid", "description": "null to unassign" },
     "base_monthly_fee": { "type": "number", "minimum": 0 },
-    "status":           { "type": "string", "enum": ["active", "unassigned", "cancelled"] }
+    "status":           { "type": "string", "enum": ["active", "unassigned", "cancelled"] },
+    "provider":         { "type": "string", "enum": ["FREE", "ORANGE", "BOUYGUES", "SFR", "CORIOLIS"] },
+    "number":           { "type": "string", "description": "FR mobile MSISDN. Accepted formats: 0[67]\\d{8} or +33[67]\\d{8}." }
   }
 }
 ```

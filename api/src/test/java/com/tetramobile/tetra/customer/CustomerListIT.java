@@ -96,7 +96,9 @@ class CustomerListIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "type", type,
-                                "base_monthly_fee", baseFee
+                                "base_monthly_fee", baseFee,
+                                "provider", "BOUYGUES",
+                                "number", "0687654321"
                         ))))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();

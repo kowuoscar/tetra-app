@@ -15,8 +15,8 @@ export async function getCustomers(params: {
 
 export async function createCustomer(data: {
   name: string
-  contact_info: string
-  whatsapp_group_id: string
+  contact_info?: string
+  whatsapp_group_id?: string
 }): Promise<CustomerDetail> {
   return apiClient('/customers', { method: 'POST', body: JSON.stringify(data) })
 }
@@ -66,10 +66,24 @@ export async function createPhone(
 
 export async function createSimCard(
   customerId: string,
-  data: { type: string; base_monthly_fee: number; phone_id?: string },
+  data: { type: string; base_monthly_fee: number; phone_id?: string; provider: string; number: string },
 ): Promise<SimCardSummary> {
   return apiClient(`/customers/${customerId}/sim-cards`, {
     method: 'POST',
     body: JSON.stringify(data),
   })
+}
+
+export async function updatePhone(
+  id: string,
+  data: { model?: string; ownership?: string; status?: string },
+): Promise<PhoneSummary> {
+  return apiClient(`/phones/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+}
+
+export async function updateSimCard(
+  id: string,
+  data: { phone_id?: string | null; base_monthly_fee?: number; status?: string; provider?: string; number?: string },
+): Promise<SimCardSummary> {
+  return apiClient(`/sim-cards/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
 }

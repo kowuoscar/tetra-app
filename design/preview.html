@@ -1059,6 +1059,11 @@
       <a href="#loading" class="sidebar-link">Loading</a>
     </div>
     <div class="sidebar-section">
+      <div class="sidebar-label">Plan-02p Updates</div>
+      <a href="#plan02p-forms" class="sidebar-link">Updated Forms</a>
+      <a href="#plan02p-phones-sim" class="sidebar-link">Phones SIM column</a>
+    </div>
+    <div class="sidebar-section">
       <div class="sidebar-label">Tokens</div>
       <a href="#elevation" class="sidebar-link">Shadows & Radius</a>
     </div>
@@ -2898,6 +2903,268 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Plan-02p: Updated Forms ─────────────────────────── -->
+    <section class="section" id="plan02p-forms">
+      <div class="section-title">Updated Forms <span style="font-size:var(--font-size-sm);font-weight:var(--font-weight-regular);color:var(--color-text-secondary);margin-left:var(--space-2)">Plan-02p</span></div>
+      <div class="section-desc">CreateCustomerModal with optional contact fields. CreateSimCardModal with provider select, FR mobile number, and conditional fee field (hidden for prepaid).</div>
+
+      <div class="subsection">
+        <div class="subsection-title">CreateCustomerModal — contact info optional</div>
+        <div class="modal-preview">
+          <div class="modal-backdrop-mock">
+            <div class="modal">
+              <div class="modal-header">
+                <div class="modal-title">New Customer</div>
+                <button class="modal-close" aria-label="Close">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="input-group">
+                  <label class="input-label">Company name <span style="color:var(--color-status-error)">*</span></label>
+                  <div class="input-wrap"><input class="input" type="text" placeholder="e.g. Al Barsha Trading LLC" /></div>
+                  <div class="helper-text">Legal entity name as registered</div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Contact info <span style="color:var(--color-text-disabled);font-weight:var(--font-weight-regular)">(optional)</span></label>
+                  <div class="input-wrap"><input class="input" type="text" placeholder="+971 50 123 4567 or email" /></div>
+                  <div class="helper-text">Phone number, email, or other contact — can be added later</div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">WhatsApp group ID <span style="color:var(--color-text-disabled);font-weight:var(--font-weight-regular)">(optional)</span></label>
+                  <div class="input-wrap"><input class="input" type="text" placeholder="e.g. 120363012345678901@g.us" /></div>
+                  <div class="helper-text">Required before WhatsApp notifications can be sent — can be added later</div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-ghost">Cancel</button>
+                <button class="btn btn-primary">Create Customer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)">
+        <div class="subsection">
+          <div class="subsection-title">CreateSimCardModal — postpaid (fee shown)</div>
+          <div class="modal-preview" style="padding:var(--space-4)">
+            <div class="modal-backdrop-mock" style="padding:var(--space-4)">
+              <div class="modal">
+                <div class="modal-header">
+                  <div class="modal-title">Add SIM Card</div>
+                  <button class="modal-close" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="input-grid">
+                    <div class="input-group">
+                      <label class="input-label">Type <span style="color:var(--color-status-error)">*</span></label>
+                      <select class="input" style="cursor:pointer">
+                        <option value="postpaid" selected>Postpaid</option>
+                        <option value="prepaid">Prepaid</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <label class="input-label">Provider <span style="color:var(--color-status-error)">*</span></label>
+                      <select class="input" style="cursor:pointer">
+                        <option value="">Select provider…</option>
+                        <option value="FREE">Free</option>
+                        <option value="ORANGE" selected>Orange</option>
+                        <option value="BOUYGUES">Bouygues</option>
+                        <option value="SFR">SFR</option>
+                        <option value="CORIOLIS">Coriolis</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Mobile number <span style="color:var(--color-status-error)">*</span></label>
+                    <div class="input-wrap"><input class="input" type="tel" placeholder="06 or 07 — e.g. 06 12 34 56 78" style="font-family:var(--font-family-mono)" /></div>
+                    <div class="helper-text">French mobile number (06 / 07 prefix)</div>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Base monthly fee (€) <span style="color:var(--color-status-error)">*</span></label>
+                    <div class="input-wrap"><input class="input" type="number" placeholder="0.00" style="font-family:var(--font-family-mono)" /></div>
+                    <div class="helper-text">Fixed amount billed each month</div>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Assign to phone <span style="color:var(--color-text-disabled);font-weight:var(--font-weight-regular)">(optional)</span></label>
+                    <select class="input" style="cursor:pointer">
+                      <option value="">Not assigned</option>
+                      <option>iPhone 15 Pro</option>
+                      <option>Google Pixel 8</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-ghost">Cancel</button>
+                  <button class="btn btn-primary">Add SIM Card</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">CreateSimCardModal — prepaid (fee hidden)</div>
+          <div class="modal-preview" style="padding:var(--space-4)">
+            <div class="modal-backdrop-mock" style="padding:var(--space-4)">
+              <div class="modal">
+                <div class="modal-header">
+                  <div class="modal-title">Add SIM Card</div>
+                  <button class="modal-close" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="input-grid">
+                    <div class="input-group">
+                      <label class="input-label">Type <span style="color:var(--color-status-error)">*</span></label>
+                      <select class="input" style="cursor:pointer">
+                        <option value="postpaid">Postpaid</option>
+                        <option value="prepaid" selected>Prepaid</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <label class="input-label">Provider <span style="color:var(--color-status-error)">*</span></label>
+                      <select class="input" style="cursor:pointer">
+                        <option value="">Select provider…</option>
+                        <option value="FREE" selected>Free</option>
+                        <option value="ORANGE">Orange</option>
+                        <option value="BOUYGUES">Bouygues</option>
+                        <option value="SFR">SFR</option>
+                        <option value="CORIOLIS">Coriolis</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Mobile number <span style="color:var(--color-status-error)">*</span></label>
+                    <div class="input-wrap"><input class="input" type="tel" value="07 98 76 54 32" style="font-family:var(--font-family-mono)" /></div>
+                    <div class="helper-text">French mobile number (06 / 07 prefix)</div>
+                  </div>
+                  <!-- base_monthly_fee field intentionally hidden for prepaid — 0 sent automatically -->
+                  <div class="input-group" style="padding:var(--space-3);background:var(--color-background-tertiary);border-radius:var(--radius-md)">
+                    <div style="font-size:var(--font-size-xs);color:var(--color-text-secondary);display:flex;align-items:center;gap:var(--space-2)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      Prepaid SIMs have no monthly fee. €0.00 will be recorded automatically.
+                    </div>
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">Assign to phone <span style="color:var(--color-text-disabled);font-weight:var(--font-weight-regular)">(optional)</span></label>
+                    <select class="input" style="cursor:pointer">
+                      <option value="">Not assigned</option>
+                      <option>iPhone 15 Pro</option>
+                      <option>Google Pixel 8</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-ghost">Cancel</button>
+                  <button class="btn btn-primary">Add SIM Card</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Plan-02p: Phones SIM column ──────────────────────── -->
+    <section class="section" id="plan02p-phones-sim">
+      <div class="section-title">CustomerPhonesTab — enriched SIM column <span style="font-size:var(--font-size-sm);font-weight:var(--font-weight-regular);color:var(--color-text-secondary);margin-left:var(--space-2)">Plan-02p</span></div>
+      <div class="section-desc">SIM card column now shows: <code>Provider · Number · type</code> and <code>· €X.XX/mo</code> appended for postpaid only. Rows with an assigned SIM show an "Unassign SIM" button alongside "Edit".</div>
+
+      <div class="subsection">
+        <div class="subsection-title">Populated — admin view</div>
+        <div class="mini-table-wrap" data-comp="CustomerPhonesTab (enriched SIM column)">
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Ownership</th>
+                <th>SIM Card</th>
+                <th>Status</th>
+                <th>Flags</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="link">iPhone 15 Pro</span></td>
+                <td class="muted">Company</td>
+                <td>
+                  <span style="font-family:var(--font-family-mono);font-size:12px;color:var(--color-text-primary)">Orange · +33 6 12 34 56 78</span>
+                  <span class="muted" style="font-size:12px"> · postpaid · </span>
+                  <span style="font-family:var(--font-family-mono);font-size:12px;color:var(--color-text-primary)">€89.00/mo</span>
+                </td>
+                <td><span class="mbadge mbadge-success">Active</span></td>
+                <td>—</td>
+                <td style="white-space:nowrap">
+                  <button class="mini-btn mini-btn-danger" style="padding:4px 10px;font-size:12px;margin-right:4px">Unassign SIM</button>
+                  <button class="mini-btn mini-btn-ghost" style="padding:4px 10px;font-size:12px">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="link">Samsung Galaxy S24</span></td>
+                <td class="muted">Customer</td>
+                <td>
+                  <span style="font-family:var(--font-family-mono);font-size:12px;color:var(--color-text-primary)">Free · +33 7 98 76 54 32</span>
+                  <span class="muted" style="font-size:12px"> · prepaid</span>
+                </td>
+                <td><span class="mbadge mbadge-success">Active</span></td>
+                <td>—</td>
+                <td style="white-space:nowrap">
+                  <button class="mini-btn mini-btn-danger" style="padding:4px 10px;font-size:12px;margin-right:4px">Unassign SIM</button>
+                  <button class="mini-btn mini-btn-ghost" style="padding:4px 10px;font-size:12px">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="link">iPhone 14</span></td>
+                <td class="muted">Customer</td>
+                <td class="muted">—</td>
+                <td><span class="mbadge mbadge-warning">In Repair</span></td>
+                <td><span class="mbadge mbadge-warning">No SIM</span></td>
+                <td style="white-space:nowrap">
+                  <button class="mini-btn mini-btn-secondary" style="padding:4px 10px;font-size:12px;margin-right:4px">Assign SIM</button>
+                  <button class="mini-btn mini-btn-ghost" style="padding:4px 10px;font-size:12px">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="link">Google Pixel 8</span></td>
+                <td class="muted">Company</td>
+                <td class="muted">—</td>
+                <td><span class="mbadge mbadge-success">Active</span></td>
+                <td><span class="mbadge mbadge-warning">No SIM</span></td>
+                <td style="white-space:nowrap">
+                  <button class="mini-btn mini-btn-secondary" style="padding:4px 10px;font-size:12px;margin-right:4px">Assign SIM</button>
+                  <button class="mini-btn mini-btn-ghost" style="padding:4px 10px;font-size:12px">Edit</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">SIM column format reference</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <div class="meta-row">
+            <span class="meta-key">Postpaid with fee</span>
+            <code class="meta-val" style="font-size:var(--font-size-xs);font-family:var(--font-family-mono)">Orange · +33 6 12 34 56 78 · postpaid · €89.00/mo</code>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">Prepaid (no fee)</span>
+            <code class="meta-val" style="font-size:var(--font-size-xs);font-family:var(--font-family-mono)">Free · +33 7 98 76 54 32 · prepaid</code>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">No SIM assigned</span>
+            <code class="meta-val" style="font-size:var(--font-size-xs);font-family:var(--font-family-mono)">—</code>
           </div>
         </div>
       </div>

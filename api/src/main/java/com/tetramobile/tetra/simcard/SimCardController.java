@@ -7,6 +7,7 @@ import com.tetramobile.tetra.simcard.dto.MonthlyBillingRequest;
 import com.tetramobile.tetra.simcard.dto.MonthlyBillingResponse;
 import com.tetramobile.tetra.simcard.dto.SimCardSummaryResponse;
 import com.tetramobile.tetra.simcard.dto.UpdateSimCardRequest;
+import com.tetramobile.tetra.simcard.model.SimProvider;
 import com.tetramobile.tetra.simcard.model.SimStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +71,17 @@ public class SimCardController {
             status = SimStatus.valueOf(body.get("status").toString());
         }
 
-        UpdateSimCardRequest request = new UpdateSimCardRequest(phoneIdPresent, phoneId, baseMonthlyFee, status);
+        SimProvider provider = null;
+        if (body.containsKey("provider") && body.get("provider") != null) {
+            provider = SimProvider.valueOf(body.get("provider").toString());
+        }
+
+        String number = null;
+        if (body.containsKey("number") && body.get("number") != null) {
+            number = body.get("number").toString();
+        }
+
+        UpdateSimCardRequest request = new UpdateSimCardRequest(phoneIdPresent, phoneId, baseMonthlyFee, status, provider, number);
         return ResponseEntity.ok(simCardService.updateSimCard(id, request));
     }
 

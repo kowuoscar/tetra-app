@@ -66,6 +66,8 @@ public class SimCardServiceImpl implements SimCardService {
         sim.setType(request.type());
         sim.setBaseMonthlyFee(request.baseMonthlyFee());
         sim.setCustomerId(customerId);
+        sim.setProvider(request.provider());
+        sim.setNumber(request.number());
 
         if (request.phoneId() != null) {
             validatePhoneAssignment(customerId, request.phoneId());
@@ -101,6 +103,14 @@ public class SimCardServiceImpl implements SimCardService {
 
         if (request.baseMonthlyFee() != null) {
             sim.setBaseMonthlyFee(request.baseMonthlyFee());
+        }
+
+        if (request.provider() != null) {
+            sim.setProvider(request.provider());
+        }
+
+        if (request.number() != null) {
+            sim.setNumber(request.number());
         }
 
         // Status can be set directly by admin (e.g., to cancel), but phone_id changes above take precedence

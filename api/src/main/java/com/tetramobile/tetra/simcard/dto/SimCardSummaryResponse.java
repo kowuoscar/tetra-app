@@ -1,6 +1,7 @@
 package com.tetramobile.tetra.simcard.dto;
 
 import com.tetramobile.tetra.simcard.model.SimCard;
+import com.tetramobile.tetra.simcard.model.SimProvider;
 import com.tetramobile.tetra.simcard.model.SimStatus;
 import com.tetramobile.tetra.simcard.model.SimType;
 
@@ -16,7 +17,9 @@ public record SimCardSummaryResponse(
         UUID customerId,
         UUID phoneId,
         boolean isUnused,
-        Instant createdAt
+        Instant createdAt,
+        SimProvider provider,
+        String number
 ) {
 
     public static SimCardSummaryResponse from(SimCard sim, boolean isUnused) {
@@ -28,7 +31,9 @@ public record SimCardSummaryResponse(
                 sim.getCustomerId(),
                 sim.getPhoneId(),
                 isUnused,
-                sim.getCreatedAt()
+                sim.getCreatedAt(),
+                sim.getProvider(),
+                sim.getNumber()
         );
     }
 }

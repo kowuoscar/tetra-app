@@ -21,11 +21,13 @@ export function CreateCustomerModal({ onClose, onCreated }: CreateCustomerModalP
     setSubmitting(true)
     setError(null)
     const formData = new FormData(e.currentTarget)
+    const contactInfo = (formData.get('contact_info') as string).trim()
+    const whatsappGroupId = (formData.get('whatsapp_group_id') as string).trim()
     try {
       await createCustomer({
         name: formData.get('name') as string,
-        contact_info: formData.get('contact_info') as string,
-        whatsapp_group_id: formData.get('whatsapp_group_id') as string,
+        contact_info: contactInfo || undefined,
+        whatsapp_group_id: whatsappGroupId || undefined,
       })
       onCreated()
     } catch {
@@ -33,12 +35,6 @@ export function CreateCustomerModal({ onClose, onCreated }: CreateCustomerModalP
       setSubmitting(false)
     }
   }
-
-  const fields = [
-    { name: 'name', label: 'Name' },
-    { name: 'contact_info', label: 'Contact info' },
-    { name: 'whatsapp_group_id', label: 'WhatsApp group ID' },
-  ] as const
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -50,17 +46,18 @@ export function CreateCustomerModal({ onClose, onCreated }: CreateCustomerModalP
           {error && (
             <p className="text-sm text-status-error">{error}</p>
           )}
-          {fields.map(f => (
-            <div key={f.name} className="space-y-1.5">
-              <Label htmlFor={f.name}>{f.label}</Label>
-              <Input
-                id={f.name}
-                name={f.name}
-                required
-                disabled={submitting}
-              />
-            </div>
-          ))}
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" name="name" required disabled={submitting} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="contact_info">Contact info <span className="text-text-secondary font-normal">(optional)</span></Label>
+            <Input id="contact_info" name="contact_info" disabled={submitting} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="whatsapp_group_id">WhatsApp group ID <span className="text-text-secondary font-normal">(optional)</span></Label>
+            <Input id="whatsapp_group_id" name="whatsapp_group_id" disabled={submitting} />
+          </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"

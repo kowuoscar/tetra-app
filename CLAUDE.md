@@ -6,8 +6,8 @@
 
 ## Current plan
 
-**Active:** `plans/plan-03-requests.md`
-**Status:** Not started
+**Active:** `plans/plan-02p-customer-asset-improvements.md`
+**Status:** In progress
 **Previous:** `plans/plan-02-customers-assets.md` — Complete
 
 Update this section at the start of each plan. It is the first thing every agent session reads.
@@ -53,6 +53,7 @@ These rules apply to every agent session without exception. Do not deviate from 
 | `vision.md` | Product intent, users, features, constraints |
 | `docs/architecture.md` | System context, component map, data flows, ERD, auth strategy |
 | `docs/contracts.md` | All API endpoints with request/response shapes |
+| `docs/drift-report.md` | Drift between code and specs found during plan-02p evolve scan |
 | `design/brief.md` | Design direction, typography, color intent, component patterns |
 | `design/tokens.md` | Complete token system — CSS custom properties + Tailwind config |
 | `design/preview.html` | Interactive component gallery and page layouts |
@@ -125,6 +126,7 @@ tetra-app/
 | 00 | `plans/plan-00-bootstrap.md` | Not started | Deployable skeleton: Spring Boot + Next.js + PostgreSQL + MinIO + CI/CD + GitOps |
 | 01 | `plans/plan-01-auth.md` | Not started | Login, JWT cookies, refresh rotation, RBAC, AppShell |
 | 02 | `plans/plan-02-customers-assets.md` | Not started | Customers, phones, SIM cards, cost breakdown, dashboard stats |
+| 02p | `plans/plan-02p-customer-asset-improvements.md` | Not started | Optional customer contact fields; SIM provider + FR number; enriched phones tab; badge fix; form validation |
 | 03 | `plans/plan-03-requests.md` | Not started | All 6 request types, status flow, asset side-effects, attachments, WhatsApp notifications |
 | 04 | `plans/plan-04-billing-invoices.md` | Not started | Company-wide monthly invoice, PDF generation, MinIO storage, sent/paid lifecycle |
 | 05 | `plans/plan-05-dashboard-costs.md` | Not started | Time tracking reports, system settings (bank details), all placeholder UI replaced |

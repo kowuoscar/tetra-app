@@ -231,6 +231,11 @@ Stack: Spring Boot 3 · Java 21 · PostgreSQL · Flyway · Spring Data JPA + Hib
 
 > **Data model gap:** The `users` table in `docs/architecture.md` does not include `is_active` or `name` columns. The backend spec adds them: `is_active BOOLEAN NOT NULL DEFAULT true` and `name VARCHAR NOT NULL`.
 
+### Customer rules <!-- feature: customer-asset-improvements | added: 2026-05-21 -->
+
+- `contact_info` and `whatsapp_group_id` are optional at creation — `POST /customers` requires only `name`. Both fields default to `null` if not provided. `PATCH /customers/{id}` may set or update them at any time.
+- WhatsApp notifications will silently skip customers where `whatsapp_group_id` is null (existing behavior per WhatsApp notification rules).
+
 ### Customer rules
 
 - `CustomerSummary.phone_count` = count of phones where `customer_id` matches and `status != 'replaced'`.
@@ -259,6 +264,9 @@ Stack: Spring Boot 3 · Java 21 · PostgreSQL · Flyway · Spring Data JPA + Hib
 - `PUT /sim-cards/{id}/monthly-billing` only applies to SIM cards with `type = 'postpaid'`. If the SIM is prepaid, return 422 with `sim_card_not_postpaid`.
 - `PUT /sim-cards/{id}/monthly-billing` is idempotent per `(sim_card_id, period_month, period_year)` — calling it twice replaces the previous value for that period. Implemented as upsert (INSERT … ON CONFLICT UPDATE).
 - `new_sim` request done side-effect: create a new SimCard row for the request's customer with `status = 'unassigned'`, `type` and `base_monthly_fee` to be confirmed via the request `notes` field at the time admin processes it. In the MVP, the admin creates the SIM record manually via `POST /customers/{id}/sim-cards` after completing the request — the request done event does not auto-create the SIM.
+- `provider` must be one of: `FREE`, `ORANGE`, `BOUYGUES`, `SFR`, `CORIOLIS`. Required at `POST /customers/{id}/sim-cards`. Accepted as optional update at `PATCH /sim-cards/{id}`. Stored as `VARCHAR` with `CHECK` constraint. <!-- feature: customer-asset-improvements | added: 2026-05-21 -->
+- `number` must match FR mobile MSISDN pattern: `^(\+33|0033|0)[67]\d{8}$`. Validation occurs at service layer. Required at `POST /customers/{id}/sim-cards`. Accepted as optional update at `PATCH /sim-cards/{id}`. Stored as `VARCHAR` (no uniqueness constraint). If validation fails, return 422 with `invalid_phone_number`. <!-- feature: customer-asset-improvements | added: 2026-05-21 -->
+- `base_monthly_fee` for prepaid SIMs: the API accepts `0` for prepaid — the frontend sends `0` automatically when type is prepaid. No special backend logic needed; existing `minimum: 0` constraint covers it. <!-- feature: customer-asset-improvements | added: 2026-05-21 -->
 
 ### Request rules
 

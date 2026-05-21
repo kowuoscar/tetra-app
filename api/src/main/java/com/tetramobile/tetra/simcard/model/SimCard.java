@@ -35,6 +35,13 @@ public class SimCard {
     @Enumerated(EnumType.STRING)
     private SimStatus status;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private SimProvider provider;
+
+    @Column(length = 20)
+    private String number;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

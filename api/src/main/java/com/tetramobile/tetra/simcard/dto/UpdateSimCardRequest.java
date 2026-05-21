@@ -1,6 +1,8 @@
 package com.tetramobile.tetra.simcard.dto;
 
+import com.tetramobile.tetra.simcard.model.SimProvider;
 import com.tetramobile.tetra.simcard.model.SimStatus;
+import jakarta.validation.constraints.Pattern;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,5 +21,7 @@ public record UpdateSimCardRequest(
         boolean phoneIdPresent,
         UUID phoneId,
         BigDecimal baseMonthlyFee,
-        SimStatus status
+        SimStatus status,
+        SimProvider provider,
+        @Pattern(regexp = "^(\\+33|0033|0)[67]\\d{8}$") String number
 ) {}

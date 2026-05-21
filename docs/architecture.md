@@ -100,6 +100,8 @@ The system consists of a Next.js frontend, a Spring Boot API backend, a PostgreS
     SIM_CARD {
         uuid id PK
         string type "prepaid|postpaid"
+        string provider "FREE|ORANGE|BOUYGUES|SFR|CORIOLIS — nullable for existing rows, required via API"
+        string number "FR mobile MSISDN — nullable for existing rows, required via API"
         decimal base_monthly_fee
         uuid customer_id FK
         uuid phone_id FK "nullable - SIM can exist without a phone"

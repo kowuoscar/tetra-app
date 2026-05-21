@@ -40,13 +40,21 @@ export type PagedResponse<T> = {
   size: number
 }
 
+export type SimProvider = 'FREE' | 'ORANGE' | 'BOUYGUES' | 'SFR' | 'CORIOLIS'
+
 export type PhoneSummary = {
   id: string
   model: string
   ownership: 'customer' | 'company'
   status: 'active' | 'in_repair' | 'replaced'
   customer_id: string
-  sim_card: { id: string; type: 'prepaid' | 'postpaid'; base_monthly_fee: number } | null
+  sim_card: {
+    id: string
+    type: 'prepaid' | 'postpaid'
+    base_monthly_fee: number
+    provider: SimProvider | null
+    number: string | null
+  } | null
   is_unused: boolean
   created_at: string
 }
@@ -60,6 +68,8 @@ export type SimCardSummary = {
   phone_id: string | null
   is_unused: boolean
   created_at: string
+  provider: SimProvider | null
+  number: string | null
 }
 
 export type CostBreakdown = {
