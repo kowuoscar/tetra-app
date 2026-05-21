@@ -72,6 +72,42 @@ export type SimCardSummary = {
   number: string | null
 }
 
+export type RequestType =
+  | 'phone_repair' | 'phone_replacement' | 'sim_topup'
+  | 'new_sim' | 'manual_support' | 'onboarding'
+
+export type RequestStatus = 'submitted' | 'in_progress' | 'done'
+
+export type AttachmentSummary = {
+  id: string
+  uploaded_by_user_id: string
+  created_at: string
+}
+
+export type RequestSummary = {
+  id: string
+  customer_id: string
+  customer_name: string
+  type: RequestType
+  status: RequestStatus
+  author: 'customer' | 'company'
+  fee: number | null
+  created_at: string
+  done_at: string | null
+}
+
+export type RequestPart = { id: string; description: string; cost: number }
+
+export type RequestDetail = RequestSummary & {
+  notes: string | null
+  phone_id: string | null
+  sim_card_id: string | null
+  updated_at: string
+  parts: RequestPart[]
+  attachments: AttachmentSummary[]
+  time_spent_minutes: number | null
+}
+
 export type CostBreakdown = {
   period_month: number
   period_year: number

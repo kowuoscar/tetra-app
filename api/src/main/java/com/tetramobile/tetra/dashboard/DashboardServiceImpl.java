@@ -5,6 +5,7 @@ import com.tetramobile.tetra.dashboard.dto.DashboardStatsResponse;
 import com.tetramobile.tetra.phone.PhoneRepository;
 import com.tetramobile.tetra.phone.model.PhoneStatus;
 import com.tetramobile.tetra.request.RequestRepository;
+import com.tetramobile.tetra.request.model.RequestStatus;
 import com.tetramobile.tetra.simcard.SimCardRepository;
 import com.tetramobile.tetra.simcard.model.SimStatus;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class DashboardServiceImpl implements DashboardService {
         long totalCustomers = customerRepository.count();
         long totalPhones    = phoneRepository.countByStatusNot(PhoneStatus.replaced);
         long totalSimCards  = simCardRepository.countByStatusNot(SimStatus.cancelled);
-        long openRequests   = requestRepository.countByStatusNot("done");
+        long openRequests   = requestRepository.countByStatusNot(RequestStatus.done);
         return new DashboardStatsResponse(totalCustomers, totalPhones, totalSimCards, openRequests);
     }
 }

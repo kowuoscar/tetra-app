@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { CustomerPhonesTab } from './CustomerPhonesTab'
 import { CustomerSimCardsTab } from './CustomerSimCardsTab'
 import { CustomerCostBreakdownTab } from './CustomerCostBreakdownTab'
+import { CustomerRequestsTab } from './CustomerRequestsTab'
 import type { CustomerDetail } from '@/types'
 
 type Tab = 'phones' | 'sims' | 'requests' | 'costs' | 'time'
@@ -52,8 +53,8 @@ export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
             <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
               Edit
             </Button>
-            <Button size="sm" disabled title="Coming in plan-03">
-              New request
+            <Button size="sm" asChild>
+              <a href={`/requests/new?customer_id=${customer.id}`}>New request</a>
             </Button>
           </div>
         )}
@@ -80,12 +81,10 @@ export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
       {/* Tab content */}
       {activeTab === 'phones' && <CustomerPhonesTab customerId={customer.id} />}
       {activeTab === 'sims' && <CustomerSimCardsTab customerId={customer.id} />}
-      {activeTab === 'requests' && (
-        <p className="text-text-secondary text-sm">Requests coming in plan-03.</p>
-      )}
+      {activeTab === 'requests' && <CustomerRequestsTab customerId={customer.id} />}
       {activeTab === 'costs' && <CustomerCostBreakdownTab customerId={customer.id} />}
       {activeTab === 'time' && isAdmin && (
-        <p className="text-text-secondary text-sm">Time tracking coming in plan-03.</p>
+        <CustomerRequestsTab customerId={customer.id} doneOnly />
       )}
 
       {showEdit && isAdmin && (

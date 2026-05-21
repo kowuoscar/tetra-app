@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.tetramobile.tetra.shared.jooq.Tables.*;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -205,10 +206,34 @@ public class CustomerQueryRepository {
                             isActual);
                 });
 
-        BigDecimal total = simFees.stream()
-                .map(SimFeeItem::amount)
+        var r = REQUESTS.as("r");
+        var p = REQUEST_PARTS.as("p");
+
+        List<CostBreakdownResponse.RequestFeeItem> requestFees = dsl
+                .select(r.ID.as("request_id"), r.TYPE.as("request_type"),
+                        coalesce(sum(p.COST), BigDecimal.ZERO).as("amount"))
+                .from(r)
+                .leftJoin(p).on(p.REQUEST_ID.eq(r.ID))
+                .where(r.CUSTOMER_ID.eq(customerId)
+                        .and(r.STATUS.eq("done"))
+                        .and(month(r.DONE_AT).eq(month))
+                        .and(year(r.DONE_AT).eq(year)))
+                .groupBy(r.ID, r.TYPE)
+                .fetch(rec -> new CostBreakdownResponse.RequestFeeItem(
+                        rec.get("request_id", UUID.class),
+                        rec.get("request_type", String.class),
+                        rec.get("amount", BigDecimal.class)
+                ));
+
+        BigDecimal requestTotal = requestFees.stream()
+                .map(CostBreakdownResponse.RequestFeeItem::amount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new CostBreakdownResponse(month, year, simFees, List.of(), total);
+        BigDecimal total = simFees.stream()
+                .map(SimFeeItem::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(requestTotal);
+
+        return new CostBreakdownResponse(month, year, simFees, requestFees, total);
     }
 }

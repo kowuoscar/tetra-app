@@ -11,6 +11,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Customers',     href: '/customers',    roles: ['admin', 'company'] },
   { label: 'Requests',      href: '/requests',     roles: ['admin', 'company', 'customer'] },
   { label: 'New Request',   href: '/requests/new', roles: ['company', 'customer'] },
+  { label: 'History',       href: '/history',      roles: ['admin'] },
   { label: 'My Phones',     href: '/phones',       roles: ['customer'] },
   { label: 'My SIM Cards',  href: '/sim-cards',    roles: ['customer'] },
   { label: 'Monthly Costs', href: '/costs',        roles: ['customer'] },
