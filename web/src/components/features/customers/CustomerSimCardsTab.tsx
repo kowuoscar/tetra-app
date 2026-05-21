@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/lib/stores/authStore'
 import { getCustomerSimCards, getCustomerPhones, createSimCard, updateSimCard } from '@/lib/data/customers'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,13 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
   const [editingSim, setEditingSim] = useState<SimCardSummary | null>(null)
   const [assigningSimPhone, setAssigningSimPhone] = useState<SimCardSummary | null>(null)
 
-  const { data, refetch, isLoading } = useQuery({
+  const qc = useQueryClient()
+  const invalidateBoth = () => {
+    qc.invalidateQueries({ queryKey: ['sim-cards', customerId] })
+    qc.invalidateQueries({ queryKey: ['phones', customerId] })
+  }
+
+  const { data, isLoading } = useQuery({
     queryKey: ['sim-cards', customerId],
     queryFn: () => getCustomerSimCards(customerId),
   })
@@ -134,7 +140,7 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
           onClose={() => setShowCreate(false)}
           onCreated={() => {
             setShowCreate(false)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
@@ -145,7 +151,7 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
           onClose={() => setEditingSim(null)}
           onSaved={() => {
             setEditingSim(null)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
@@ -157,7 +163,7 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
           onClose={() => setAssigningSimPhone(null)}
           onSaved={() => {
             setAssigningSimPhone(null)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}

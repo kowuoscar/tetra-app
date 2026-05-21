@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/lib/stores/authStore'
 import { getCustomerPhones, getCustomerSimCards, createPhone, updatePhone, updateSimCard } from '@/lib/data/customers'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,13 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
   const [assigningPhone, setAssigningPhone] = useState<PhoneSummary | null>(null)
   const [unassigningSimId, setUnassigningSimId] = useState<string | null>(null)
 
-  const { data, refetch, isLoading } = useQuery({
+  const qc = useQueryClient()
+  const invalidateBoth = () => {
+    qc.invalidateQueries({ queryKey: ['phones', customerId] })
+    qc.invalidateQueries({ queryKey: ['sim-cards', customerId] })
+  }
+
+  const { data, isLoading } = useQuery({
     queryKey: ['phones', customerId],
     queryFn: () => getCustomerPhones(customerId),
   })
@@ -138,7 +144,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
           onClose={() => setShowCreate(false)}
           onCreated={() => {
             setShowCreate(false)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
@@ -149,7 +155,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
           onClose={() => setEditingPhone(null)}
           onSaved={() => {
             setEditingPhone(null)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
@@ -161,7 +167,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
           onClose={() => setAssigningPhone(null)}
           onSaved={() => {
             setAssigningPhone(null)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
@@ -172,7 +178,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
           onClose={() => setUnassigningSimId(null)}
           onDone={() => {
             setUnassigningSimId(null)
-            refetch()
+            invalidateBoth()
           }}
         />
       )}
