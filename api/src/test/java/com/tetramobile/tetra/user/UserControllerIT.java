@@ -92,7 +92,7 @@ class UserControllerIT {
                         .cookie(new Cookie("access_token", adminToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.totalElements").isNumber());
+                .andExpect(jsonPath("$.total_elements").isNumber());
     }
 
     @Test

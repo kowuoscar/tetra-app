@@ -6,9 +6,9 @@
 
 ## Current plan
 
-**Active:** `plans/plan-02-customers-assets.md`
-**Status:** Not started
-**Previous:** `plans/plan-01-auth.md` — Complete
+**Active:** `plans/plan-02p-customer-asset-improvements.md`
+**Status:** In progress
+**Previous:** `plans/plan-02-customers-assets.md` — Complete
 
 Update this section at the start of each plan. It is the first thing every agent session reads.
 
@@ -53,6 +53,7 @@ These rules apply to every agent session without exception. Do not deviate from 
 | `vision.md` | Product intent, users, features, constraints |
 | `docs/architecture.md` | System context, component map, data flows, ERD, auth strategy |
 | `docs/contracts.md` | All API endpoints with request/response shapes |
+| `docs/drift-report.md` | Drift between code and specs found during plan-02p evolve scan |
 | `design/brief.md` | Design direction, typography, color intent, component patterns |
 | `design/tokens.md` | Complete token system — CSS custom properties + Tailwind config |
 | `design/preview.html` | Interactive component gallery and page layouts |
@@ -125,6 +126,7 @@ tetra-app/
 | 00 | `plans/plan-00-bootstrap.md` | Not started | Deployable skeleton: Spring Boot + Next.js + PostgreSQL + MinIO + CI/CD + GitOps |
 | 01 | `plans/plan-01-auth.md` | Not started | Login, JWT cookies, refresh rotation, RBAC, AppShell |
 | 02 | `plans/plan-02-customers-assets.md` | Not started | Customers, phones, SIM cards, cost breakdown, dashboard stats |
+| 02p | `plans/plan-02p-customer-asset-improvements.md` | Not started | Optional customer contact fields; SIM provider + FR number; enriched phones tab; badge fix; form validation |
 | 03 | `plans/plan-03-requests.md` | Not started | All 6 request types, status flow, asset side-effects, attachments, WhatsApp notifications |
 | 04 | `plans/plan-04-billing-invoices.md` | Not started | Company-wide monthly invoice, PDF generation, MinIO storage, sent/paid lifecycle |
 | 05 | `plans/plan-05-dashboard-costs.md` | Not started | Time tracking reports, system settings (bank details), all placeholder UI replaced |
@@ -171,4 +173,10 @@ tetra-app/
 
 ## Deferred decisions
 
-No deferred decisions.
+| Decision | Plan | Before | Impact |
+|----------|------|--------|--------|
+| PR #3 minor: `fetchCount` wraps full correlated-subquery SELECT — doubles DB work on customer list pagination | Plan 02 | Plan 05 | Negligible at current scale; optimise if list grows large |
+| PR #3 minor: `CustomerQueryRepository` uses string literals for enum comparisons (`.ne("replaced")`) — typed enums not possible with VARCHAR+CHECK columns | Plan 02 | — | Intentional, correct for schema design; no action needed |
+| PR #3 minor: `PhoneController`/`SimCardController` use `/api/v1` base mapping vs `/api/v1/customers` in `CustomerController` — style inconsistency | Plan 02 | Plan 03 | Readability only; no functional impact |
+| PR #3 minor: `jooq-schema.sql` lacks explicit warning that it is H2-only DDL diverging from V1 migration | Plan 02 | Plan 03 | Could confuse new devs; add comment at top of file |
+| PR #3 minor: `whatsapp_group_id` required at customer creation — confirm product intent; relax to nullable+PATCH if admins need to set later | Plan 02 | Plan 03 | One-field constraint; backend and frontend currently consistent |

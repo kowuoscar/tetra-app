@@ -1,6 +1,8 @@
 spring:
   application:
     name: tetra-api
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tetra}
     username: ${SPRING_DATASOURCE_USERNAME:tetra}

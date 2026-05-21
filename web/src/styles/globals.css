@@ -262,5 +262,6 @@
   --z-index-sticky:   200;
   --z-index-overlay:  300;
   --z-index-modal:    400;
+  --z-index-popover:  450;
   --z-index-toast:    500;
 }

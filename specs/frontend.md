@@ -66,6 +66,8 @@ Stack: Next.js 15 (App Router) · TypeScript · Tailwind CSS · shadcn/ui · Tan
   - `POST /customers/{id}/sim-cards` — admin creates SIM (modal on SIM tab)
 - **Components:** `AppShell`, `CustomerDetailHeader`, `CustomerTabNav`, `CustomerPhonesTab`, `CustomerSimCardsTab`, `CustomerRequestsTab`, `CustomerCostBreakdownTab`, `CustomerTimeTrackingTab`, `EditCustomerModal`, `CreatePhoneModal`, `CreateSimCardModal`
 
+> ⚠️ NOT YET IMPLEMENTED: `CustomerRequestsTab` (plan-03), `CustomerTimeTrackingTab` (plan-03). Both tabs are present in the nav but render placeholder text. <!-- drift-corrected: 2026-05-21 -->
+
 ---
 
 ### Request List
@@ -595,7 +597,7 @@ interface SimCardCardProps {
 
 ### StatusBadge
 
-**Description:** Color-coded pill badge mapping entity statuses to semantic colors.
+**Description:** Color-coded pill badge mapping entity statuses to semantic colors. Includes a 6px dot indicator matching the badge color. <!-- drift-corrected: 2026-05-21 — dot indicator was in design preview but not in implementation; badge.tsx used Base UI useRender with only default/secondary/destructive/outline variants — no semantic status variants. Component needs rebuild. -->
 **Pages:** All pages with request, phone, SIM, or invoice data
 
 **Props:**
@@ -625,6 +627,7 @@ Status→color mapping:
 - Radius: `--radius-full`
 - Font: `--font-size-xs`, `--font-weight-medium`
 - Padding: `2px --space-2`
+- Dot: 6px circle, color matches badge text color
 
 **Contract:** None (display only)
 
@@ -1033,6 +1036,8 @@ interface EditPhoneModalProps {
 
 **States:** idle | submitting | error
 
+> ⚠️ KNOWN BUG: `EditPhoneModal` renders `status = 'replaced'` as a selectable option. Backend returns 422 `invalid_status_transition` for this value — the option must be removed. <!-- drift-corrected: 2026-05-21 -->
+
 **Contract:** `POST /customers/{id}/phones`, `PATCH /phones/{id}`
 
 ---
@@ -1060,6 +1065,48 @@ interface ActualAmountModalProps {
 **States:** idle | submitting | error
 
 **Contracts:** `POST /customers/{id}/sim-cards`, `PATCH /sim-cards/{id}`, `PUT /sim-cards/{id}/monthly-billing`
+
+---
+
+### AssignSimModal <!-- drift-corrected: 2026-05-21 — component exists in CustomerPhonesTab.tsx, not previously in spec -->
+
+**Description:** Modal on the Phones tab for assigning an unassigned SIM card to a phone. Lists unassigned SIM cards for the customer; admin selects one via radio list.
+**Pages:** Customer Detail (Phones tab)
+
+**Props:**
+```typescript
+interface AssignSimModalProps {
+  customerId: string
+  phone: PhoneSummary
+  onClose: () => void
+  onSaved: () => void
+}
+```
+
+**States:** loading | empty (no unassigned SIMs) | selecting | submitting | error
+
+**Contract:** `PATCH /sim-cards/{id}` (assigns selected SIM to phone)
+
+---
+
+### AssignPhoneModal <!-- drift-corrected: 2026-05-21 — component exists in CustomerSimCardsTab.tsx, not previously in spec -->
+
+**Description:** Modal on the SIM Cards tab for assigning an unassigned phone to a SIM. Lists phones with no SIM assigned for the customer; admin selects one via radio list.
+**Pages:** Customer Detail (SIM Cards tab)
+
+**Props:**
+```typescript
+interface AssignPhoneModalProps {
+  customerId: string
+  sim: SimCardSummary
+  onClose: () => void
+  onSaved: () => void
+}
+```
+
+**States:** loading | empty (no unassigned phones) | selecting | submitting | error
+
+**Contract:** `PATCH /sim-cards/{id}` (assigns phone to SIM)
 
 ---
 
@@ -1187,6 +1234,98 @@ interface MonthPickerProps {
 - Border: `--color-border-strong`
 
 **Contract:** None (drives query params for `GET /customers/{id}/cost-breakdown`)
+
+---
+
+<!-- feature: customer-asset-improvements | added: 2026-05-21 -->
+
+### StatusBadge (rebuilt)
+
+**Description:** Replaces the broken Base UI `badge.tsx`. Standalone `<span>`-based component with semantic status variants and a 6px dot indicator. Matches `design/preview.html#badges` exactly.
+**Pages:** All pages with request, phone, SIM, or invoice data (replaces all inline `StatusPill` uses)
+
+**Props:**
+```typescript
+type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'brand'
+
+interface StatusBadgeProps {
+  variant: BadgeVariant
+  children: React.ReactNode
+  dot?: boolean  // default true
+  className?: string
+}
+```
+
+Variant→token mapping:
+- `success`: bg `status-successBg`, text `status-success`, dot `status-success`
+- `warning`: bg `status-warningBg`, text `status-warning`, dot `status-warning`
+- `error`: bg `status-errorBg`, text `status-error`, dot `status-error`
+- `info`: bg `status-infoBg`, text `status-info`, dot `status-info`
+- `neutral`: bg `bg-tertiary`, text `text-secondary`, dot `text-disabled`
+- `brand`: bg `brand-secondary`, text `brand-primary`, dot `brand-primary`
+
+Helper export `statusVariant(status, entity)` maps entity status strings to `BadgeVariant`:
+- Request: `submitted→info`, `in_progress→warning`, `done→success`
+- Phone: `active→success`, `in_repair→warning`, `replaced→neutral`
+- SIM: `active→success`, `unassigned→warning`, `cancelled→neutral`
+- Invoice: `draft→neutral`, `sent→info`, `paid→success`
+
+**States:**
+| State | Description | Visual treatment |
+|-------|-------------|-----------------|
+| default | Any variant | Pill + dot matching variant colors |
+
+**Token references:**
+- Radius: `--radius-full`
+- Font: `--font-size-xs` (`text-xs`), `--font-weight-medium` (`font-medium`)
+- Padding: `px-2 py-0.5`
+- Dot: `w-1.5 h-1.5 rounded-full` (6px)
+- Gap between dot and label: `gap-1.5`
+
+**Contract:** None (display only)
+
+---
+
+### CustomerPhonesTab — SIM column and Unassign button (updated)
+
+**Description:** Extension of the existing Phones tab — SIM Card column now shows provider, number, type, and monthly cost (postpaid only). Adds "Unassign SIM" button for phones that have a SIM assigned.
+**Pages:** Customer Detail (Phones tab)
+
+**SIM card column display format:**
+- When SIM assigned and postpaid: `{Provider} · {Number} · postpaid · €X.XX/mo`
+- When SIM assigned and prepaid: `{Provider} · {Number} · prepaid`
+- When no SIM: `—`
+- All fields rendered as a single pill (`brand` variant) or plain text
+
+**Unassign SIM button:**
+- Shown when `phone.sim_card !== null` (admin only)
+- Position: alongside "Assign SIM" / "Edit" in actions column
+- On click: calls `PATCH /sim-cards/{phone.sim_card.id}` with `{ phone_id: null }`
+- On success: refetch phones and SIM cards query keys
+
+**Contract:** `PATCH /sim-cards/{id}` (unassign)
+
+---
+
+### CreateSimCardModal / EditSimCardModal (updated)
+
+**Description:** Extended to include `provider` select and `number` text input. `base_monthly_fee` field conditionally shown (postpaid only).
+**Pages:** Customer Detail (SIM Cards tab)
+
+**Field changes:**
+- New field `provider`: `<select>` with options Free/Orange/Bouygues/SFR/Coriolis (required)
+- New field `number`: `<input type="tel">` with `pattern="^(\\+33|0033|0)[67]\\d{8}$"` and `title="French mobile number (e.g. 0612345678)"` (required)
+- `base_monthly_fee`: hidden via `type=prepaid` conditional — when type=prepaid, field is not rendered and value `0` is submitted automatically
+- Edit modal pre-fills all fields including provider and number
+
+**Form validation (all customer/asset forms):**
+- Customer create/edit: `name` required (`minLength=1`), others optional
+- Phone create: `model` required (`minLength=1`); `ownership` enforced by select default
+- Phone edit: same as create + status select excludes `replaced` option (bug fix from drift)
+- SIM create: `type` required, `provider` required, `number` required with FR mobile pattern, `base_monthly_fee` required+`min=0` for postpaid
+- SIM edit: all optional but pattern enforced when `number` is provided
+
+**Contract:** `POST /customers/{id}/sim-cards`, `PATCH /sim-cards/{id}`
 
 ---
 

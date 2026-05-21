@@ -1,52 +1,68 @@
-import { mergeProps } from "@base-ui/react/merge-props"
-import { useRender } from "@base-ui/react/use-render"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from '@/lib/utils'
 
-import { cn } from "@/lib/utils"
+export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'brand'
 
-const badgeVariants = cva(
-  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-        secondary:
-          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
-        destructive:
-          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
-        outline:
-          "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
-        ghost:
-          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-function Badge({
-  className,
-  variant = "default",
-  render,
-  ...props
-}: useRender.ComponentProps<"span"> & VariantProps<typeof badgeVariants>) {
-  return useRender({
-    defaultTagName: "span",
-    props: mergeProps<"span">(
-      {
-        className: cn(badgeVariants({ variant }), className),
-      },
-      props
-    ),
-    render,
-    state: {
-      slot: "badge",
-      variant,
-    },
-  })
+const variantClasses: Record<BadgeVariant, string> = {
+  success: 'bg-status-success-bg text-status-success',
+  warning: 'bg-status-warning-bg text-status-warning',
+  error:   'bg-status-error-bg   text-status-error',
+  info:    'bg-status-info-bg    text-status-info',
+  neutral: 'bg-bg-tertiary       text-text-secondary',
+  brand:   'bg-brand-secondary   text-brand-primary',
 }
 
-export { Badge, badgeVariants }
+const dotClasses: Record<BadgeVariant, string> = {
+  success: 'bg-status-success',
+  warning: 'bg-status-warning',
+  error:   'bg-status-error',
+  info:    'bg-status-info',
+  neutral: 'bg-text-disabled',
+  brand:   'bg-brand-primary',
+}
+
+export function statusVariant(status: string): BadgeVariant {
+  const map: Record<string, BadgeVariant> = {
+    submitted:   'info',
+    in_progress: 'warning',
+    done:        'success',
+    active:      'success',
+    in_repair:   'warning',
+    replaced:    'neutral',
+    unassigned:  'warning',
+    cancelled:   'neutral',
+    draft:       'neutral',
+    sent:        'info',
+    paid:        'success',
+  }
+  return map[status] ?? 'neutral'
+}
+
+interface StatusBadgeProps {
+  variant?: BadgeVariant
+  dot?: boolean
+  children: React.ReactNode
+  className?: string
+}
+
+export function StatusBadge({
+  variant = 'neutral',
+  dot = true,
+  children,
+  className,
+}: StatusBadgeProps) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-[5px] rounded-full px-2 py-[2px]',
+        'text-xs font-medium leading-[1.5] whitespace-nowrap',
+        variantClasses[variant],
+        className
+      )}
+    >
+      {dot && variant !== 'brand' && (
+        <span className={cn('w-[6px] h-[6px] rounded-full flex-shrink-0', dotClasses[variant])} />
+      )}
+      {children}
+    </span>
+  )
+}
