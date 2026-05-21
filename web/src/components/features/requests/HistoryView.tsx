@@ -32,12 +32,12 @@ export function HistoryView() {
     }),
   })
 
-  const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 0
+  const totalPages = data ? data.total_pages : 0
 
   return (
     <div className="space-y-4">
       <div className="flex gap-3">
-        <Select value={type} onValueChange={v => { setType(v as RequestType | 'all'); setPage(0) }}>
+        <Select value={type} onValueChange={v => { setType((v ?? 'all') as RequestType | 'all'); setPage(0) }}>
           <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All types</SelectItem>

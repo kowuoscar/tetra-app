@@ -53,9 +53,12 @@ export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
             <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
               Edit
             </Button>
-            <Button size="sm" asChild>
-              <a href={`/requests/new?customer_id=${customer.id}`}>New request</a>
-            </Button>
+            <a
+              href={`/requests/new?customer_id=${customer.id}`}
+              className="inline-flex items-center px-3 py-1.5 bg-brand-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+            >
+              New request
+            </a>
           </div>
         )}
       </div>

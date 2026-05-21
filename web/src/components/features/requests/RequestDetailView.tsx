@@ -4,9 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getRequest, updateRequest, addPart, deletePart, uploadAttachment, downloadAttachment } from '@/lib/data/requests'
 import { useAuthStore } from '@/lib/stores/authStore'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { RequestStatus } from '@/types'
 
 const STATUS_LABELS: Record<RequestStatus, string> = {
@@ -35,10 +33,9 @@ const NEXT_STATUS: Partial<Record<RequestStatus, RequestStatus>> = {
 
 interface Props {
   requestId: string
-  userRole: string
 }
 
-export function RequestDetailView({ requestId, userRole }: Props) {
+export function RequestDetailView({ requestId }: Props) {
   const qc = useQueryClient()
   const isAdmin = useAuthStore(s => s.isAdmin())
   const isAdminOrCompany = useAuthStore(s => s.isAdmin() || s.isCompany())

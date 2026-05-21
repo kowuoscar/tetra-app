@@ -112,7 +112,7 @@ export function NewRequestForm({
         {!isCustomer && (
           <div className="space-y-1.5">
             <Label>Customer</Label>
-            <Select value={customerId} onValueChange={setCustomerId}>
+            <Select value={customerId} onValueChange={v => setCustomerId(v ?? '')}>
               <SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger>
               <SelectContent>
                 {customers?.content.map(c => (
@@ -126,7 +126,7 @@ export function NewRequestForm({
         {type && PHONE_TYPES.includes(type) && customerId && (
           <div className="space-y-1.5">
             <Label>Phone (optional)</Label>
-            <Select value={phoneId} onValueChange={setPhoneId}>
+            <Select value={phoneId} onValueChange={v => setPhoneId(v ?? '')}>
               <SelectTrigger><SelectValue placeholder="Select phone" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="">None</SelectItem>
@@ -141,7 +141,7 @@ export function NewRequestForm({
         {type && SIM_TYPES.includes(type) && customerId && (
           <div className="space-y-1.5">
             <Label>SIM Card (optional)</Label>
-            <Select value={simCardId} onValueChange={setSimCardId}>
+            <Select value={simCardId} onValueChange={v => setSimCardId(v ?? '')}>
               <SelectTrigger><SelectValue placeholder="Select SIM" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="">None</SelectItem>
