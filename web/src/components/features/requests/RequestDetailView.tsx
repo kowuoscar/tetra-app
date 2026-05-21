@@ -39,41 +39,36 @@ const STEP_ORDER: RequestStatus[] = ['submitted', 'in_progress', 'done']
 function StatusStepper({ status }: { status: RequestStatus }) {
   const current = STEP_ORDER.indexOf(status)
   return (
-    <div className="flex items-center gap-0">
+    <div className="flex items-center">
       {STEP_ORDER.map((s, i) => {
         const isPast = i < current
         const isActive = i === current
         return (
           <div key={s} className="flex items-center">
-            <div className="flex flex-col items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <div
                 className={[
-                  'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border',
+                  'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0',
                   isPast
-                    ? 'bg-status-success/10 border-status-success text-status-success'
+                    ? 'bg-status-success/10 text-status-success'
                     : isActive
-                    ? 'bg-brand-secondary border-brand-primary text-brand-primary'
-                    : 'bg-surface border-border text-text-disabled',
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-surface-raised text-text-disabled',
                 ].join(' ')}
               >
                 {isPast ? '✓' : i + 1}
               </div>
               <span
                 className={[
-                  'text-xs whitespace-nowrap',
-                  isPast ? 'text-status-success' : isActive ? 'text-brand-primary font-medium' : 'text-text-disabled',
+                  'text-xs font-medium whitespace-nowrap',
+                  isPast ? 'text-status-success' : isActive ? 'text-brand-primary' : 'text-text-disabled',
                 ].join(' ')}
               >
                 {STATUS_LABELS[s]}
               </span>
             </div>
             {i < STEP_ORDER.length - 1 && (
-              <div
-                className={[
-                  'h-px w-16 mx-2 mb-5',
-                  isPast ? 'bg-status-success' : 'bg-border',
-                ].join(' ')}
-              />
+              <div className={['flex-1 h-px mx-3 min-w-5', isPast ? 'bg-status-success' : 'bg-border'].join(' ')} />
             )}
           </div>
         )
@@ -141,7 +136,21 @@ export function RequestDetailView({ requestId }: Props) {
   }
 
   if (isLoading || !req) {
-    return <div className="text-text-secondary text-sm py-8">Loading…</div>
+    return (
+      <div className="space-y-5 max-w-5xl animate-pulse">
+        <div className="bg-surface border border-border rounded-xl px-6 py-5 space-y-3">
+          <div className="h-5 bg-surface-raised rounded w-40" />
+          <div className="h-4 bg-surface-raised rounded w-64" />
+        </div>
+        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
+          <div className="space-y-4">
+            <div className="bg-surface border border-border rounded-xl p-5 h-24" />
+            <div className="bg-surface border border-border rounded-xl p-5 h-40" />
+          </div>
+          <div className="bg-surface border border-border rounded-xl p-5 h-48" />
+        </div>
+      </div>
+    )
   }
 
   const availableNextStatuses = STEP_ORDER.filter(s => STEP_ORDER.indexOf(s) > STEP_ORDER.indexOf(req.status))
