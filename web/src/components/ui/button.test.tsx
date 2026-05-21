@@ -29,7 +29,7 @@ describe('Button', () => {
   it('destructive variant uses error status tokens', () => {
     render(<Button variant="destructive">Delete</Button>)
     const el = screen.getByRole('button', { name: 'Delete' })
-    expect(el.className).toContain('bg-status-errorBg')
+    expect(el.className).toContain('bg-status-error-bg')
     expect(el.className).toContain('text-status-error')
   })
 

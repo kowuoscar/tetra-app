@@ -25,14 +25,14 @@ function wrapper({ children }: { children: React.ReactNode }) {
 // ── Status badge design tokens (original tests) ────────────────────────────
 
 const STATUS_CLASSES: Record<string, string> = {
-  active:     'bg-status-successBg text-status-success',
+  active:     'bg-status-success-bg text-status-success',
   unassigned: 'bg-bg-tertiary text-text-secondary',
   cancelled:  'bg-bg-tertiary text-text-secondary',
 }
 
 describe('CustomerSimCardsTab — status badge design tokens', () => {
   it('active SIM uses success status tokens', () => {
-    expect(STATUS_CLASSES['active']).toContain('bg-status-successBg')
+    expect(STATUS_CLASSES['active']).toContain('bg-status-success-bg')
     expect(STATUS_CLASSES['active']).toContain('text-status-success')
   })
 
@@ -55,8 +55,8 @@ describe('CustomerSimCardsTab — status badge design tokens', () => {
   })
 
   it('unused SIM badge uses warning tokens', () => {
-    const unusedClass = 'bg-status-warningBg text-status-warning'
-    expect(unusedClass).toContain('bg-status-warningBg')
+    const unusedClass = 'bg-status-warning-bg text-status-warning'
+    expect(unusedClass).toContain('bg-status-warning-bg')
     expect(unusedClass).toContain('text-status-warning')
   })
 })

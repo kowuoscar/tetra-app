@@ -13,21 +13,21 @@ describe('StatusBadge', () => {
   it('success variant applies correct tokens', () => {
     render(<StatusBadge variant="success">Active</StatusBadge>)
     const el = screen.getByText('Active').closest('span')!
-    expect(el.className).toContain('bg-status-successBg')
+    expect(el.className).toContain('bg-status-success-bg')
     expect(el.className).toContain('text-status-success')
   })
 
   it('warning variant applies correct tokens', () => {
     render(<StatusBadge variant="warning">In Repair</StatusBadge>)
     const el = screen.getByText('In Repair').closest('span')!
-    expect(el.className).toContain('bg-status-warningBg')
+    expect(el.className).toContain('bg-status-warning-bg')
     expect(el.className).toContain('text-status-warning')
   })
 
   it('error variant applies correct tokens', () => {
     render(<StatusBadge variant="error">Error</StatusBadge>)
     const el = screen.getByText('Error').closest('span')!
-    expect(el.className).toContain('bg-status-errorBg')
+    expect(el.className).toContain('bg-status-error-bg')
     expect(el.className).toContain('text-status-error')
   })
 

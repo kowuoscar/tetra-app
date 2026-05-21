@@ -6,8 +6,8 @@ import Link from 'next/link'
 import type { SimCardSummary } from '@/types'
 
 const STATUS_COLORS: Record<SimCardSummary['status'], string> = {
-  active:     'bg-status-successBg text-status-success',
-  unassigned: 'bg-status-warningBg text-status-warning',
+  active:     'bg-status-success-bg text-status-success',
+  unassigned: 'bg-status-warning-bg text-status-warning',
   cancelled:  'bg-bg-tertiary text-text-secondary',
 }
 
@@ -63,7 +63,7 @@ export function SimCardsView({ customerId }: { customerId: string }) {
           </div>
 
           {sim.is_unused && (
-            <div className="bg-status-warningBg border border-status-warningBg rounded-md px-3 py-2 text-xs text-status-warning">
+            <div className="bg-status-warning-bg border border-status-warning-bg rounded-md px-3 py-2 text-xs text-status-warning">
               No phone assigned
             </div>
           )}

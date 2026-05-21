@@ -25,19 +25,19 @@ function wrapper({ children }: { children: React.ReactNode }) {
 // ── Status badge design tokens (original tests) ────────────────────────────
 
 const STATUS_CLASSES: Record<string, string> = {
-  active:     'bg-status-successBg text-status-success',
-  in_repair:  'bg-status-warningBg text-status-warning',
+  active:     'bg-status-success-bg text-status-success',
+  in_repair:  'bg-status-warning-bg text-status-warning',
   replaced:   'bg-bg-tertiary text-text-secondary',
 }
 
 describe('CustomerPhonesTab — status badge design tokens', () => {
   it('active phone uses success status tokens', () => {
-    expect(STATUS_CLASSES['active']).toContain('bg-status-successBg')
+    expect(STATUS_CLASSES['active']).toContain('bg-status-success-bg')
     expect(STATUS_CLASSES['active']).toContain('text-status-success')
   })
 
   it('in_repair phone uses warning status tokens', () => {
-    expect(STATUS_CLASSES['in_repair']).toContain('bg-status-warningBg')
+    expect(STATUS_CLASSES['in_repair']).toContain('bg-status-warning-bg')
     expect(STATUS_CLASSES['in_repair']).toContain('text-status-warning')
   })
 
@@ -55,8 +55,8 @@ describe('CustomerPhonesTab — status badge design tokens', () => {
   })
 
   it('unused SIM badge uses warning tokens', () => {
-    const unusedClass = 'bg-status-warningBg text-status-warning'
-    expect(unusedClass).toContain('bg-status-warningBg')
+    const unusedClass = 'bg-status-warning-bg text-status-warning'
+    expect(unusedClass).toContain('bg-status-warning-bg')
     expect(unusedClass).toContain('text-status-warning')
   })
 })

@@ -3,12 +3,12 @@ import { cn } from '@/lib/utils'
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'brand'
 
 const variantClasses: Record<BadgeVariant, string> = {
-  success: 'bg-status-successBg text-status-success',
-  warning: 'bg-status-warningBg text-status-warning',
-  error:   'bg-status-errorBg   text-status-error',
-  info:    'bg-status-infoBg    text-status-info',
-  neutral: 'bg-bg-tertiary      text-text-secondary',
-  brand:   'bg-brand-secondary  text-brand-primary',
+  success: 'bg-status-success-bg text-status-success',
+  warning: 'bg-status-warning-bg text-status-warning',
+  error:   'bg-status-error-bg   text-status-error',
+  info:    'bg-status-info-bg    text-status-info',
+  neutral: 'bg-bg-tertiary       text-text-secondary',
+  brand:   'bg-brand-secondary   text-brand-primary',
 }
 
 const dotClasses: Record<BadgeVariant, string> = {

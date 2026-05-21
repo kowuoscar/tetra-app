@@ -12,7 +12,7 @@ const buttonVariants = cva(
         outline:     "border-border bg-transparent hover:bg-bg-tertiary hover:text-text-primary",
         secondary:   "bg-bg-tertiary text-text-primary hover:bg-bg-secondary",
         ghost:       "hover:bg-bg-tertiary hover:text-text-primary",
-        destructive: "bg-status-errorBg text-status-error hover:bg-status-errorBg/80",
+        destructive: "bg-status-error-bg text-status-error hover:bg-status-error-bg/80",
         link:        "text-brand-primary underline-offset-4 hover:underline",
       },
       size: {

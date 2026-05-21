@@ -45,7 +45,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="bg-surface shadow-md rounded-xl p-8 space-y-5">
       {state === 'error' && (
-        <div className="bg-status-errorBg text-status-error border border-status-error/20 rounded-md px-4 py-3 text-sm">
+        <div className="bg-status-error-bg text-status-error border border-status-error/20 rounded-md px-4 py-3 text-sm">
           {ERROR_MESSAGES[errorCode]}
         </div>
       )}
