@@ -48,6 +48,8 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
             <thead>
               <tr>
                 <th className={TH}>Type</th>
+                <th className={TH}>Provider</th>
+                <th className={TH}>Number</th>
                 <th className={TH}>Base Fee</th>
                 <th className={TH}>Phone</th>
                 <th className={TH}>Status</th>
@@ -61,8 +63,20 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
                   <td className={`${TD} capitalize`}>
                     <span className="text-brand-primary font-medium">{sim.type}</span>
                   </td>
+                  <td className={TD}>
+                    {sim.provider ? (
+                      <span className="text-text-primary capitalize">
+                        {sim.provider.charAt(0) + sim.provider.slice(1).toLowerCase()}
+                      </span>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
+                  </td>
+                  <td className={`${TD} font-mono text-xs`}>
+                    {sim.number ?? <span className="text-text-secondary">—</span>}
+                  </td>
                   <td className={`${TD} font-mono text-xs text-text-secondary`}>
-                    €{sim.base_monthly_fee.toFixed(2)}/mo
+                    {sim.type === 'postpaid' ? `€${sim.base_monthly_fee.toFixed(2)}/mo` : <span className="text-text-secondary">—</span>}
                   </td>
                   <td className={TD}>
                     {sim.phone_id ? (
