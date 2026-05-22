@@ -42,9 +42,11 @@ interface Props {
   initialSimCardId?: string
   initialCustomerId?: string
   userRole: string
+  onCancel?: () => void
+  embedded?: boolean
 }
 
-export function NewRequestForm({ initialPhoneId, initialSimCardId, initialCustomerId, userRole }: Props) {
+export function NewRequestForm({ initialPhoneId, initialSimCardId, initialCustomerId, userRole, onCancel, embedded }: Props) {
   const router = useRouter()
   const isCustomer = userRole === 'customer'
 
@@ -142,6 +144,7 @@ export function NewRequestForm({ initialPhoneId, initialSimCardId, initialCustom
         sim_card_id: simCardId || undefined,
       })
       router.push(`/requests/${req.id}`)
+      // modal callers: navigation unmounts the modal naturally
     } catch (err: unknown) {
       setError((err as { message?: string }).message ?? 'Submission failed')
       setSubmitting(false)
@@ -170,220 +173,227 @@ export function NewRequestForm({ initialPhoneId, initialSimCardId, initialCustom
   const isOnboarding = type === 'onboarding'
   const isNewSim = type === 'new_sim'
 
+  const fields = (
+    <div className={embedded ? 'space-y-5' : 'px-6 py-5 space-y-5'}>
+      {/* Type + Customer row */}
+      <div className={`grid gap-4 ${!isCustomer && !isOnboarding ? 'grid-cols-2' : 'grid-cols-1 max-w-xs'}`}>
+        <div className="space-y-1.5">
+          <Label htmlFor="type">Request type</Label>
+          <select
+            id="type"
+            className={NATIVE_SELECT_CLS}
+            value={type}
+            onChange={e => handleTypeChange(e.target.value as RequestType)}
+          >
+            {REQUEST_TYPES.map(rt => (
+              <option key={rt.value} value={rt.value}>{rt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {!isCustomer && !isOnboarding && (
+          <div className="space-y-1.5">
+            <Label htmlFor="customer">Customer</Label>
+            <select
+              id="customer"
+              className={NATIVE_SELECT_CLS}
+              value={customerId}
+              onChange={e => handleCustomerChange(e.target.value)}
+              disabled={customersLoading}
+            >
+              <option value="">
+                {customersLoading ? 'Loading…' : 'Select customer'}
+              </option>
+              {customers?.content.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Phone (required for phone_repair / phone_replacement) */}
+      {needsPhone && !isCustomer && (
+        <div className="space-y-1.5">
+          <Label htmlFor="phone">
+            Phone
+            {' '}<span className="text-text-disabled text-xs font-normal">(required for this type)</span>
+          </Label>
+          <select
+            id="phone"
+            className={NATIVE_SELECT_CLS}
+            value={phoneId}
+            onChange={e => setPhoneId(e.target.value)}
+            disabled={!customerId}
+          >
+            <option value="">{customerId ? 'Select phone' : 'Select customer first'}</option>
+            {eligiblePhones.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.model}
+                {p.sim_card ? ` — ${p.sim_card.provider ?? ''} ${p.sim_card.number ?? ''}`.trim() : ''}
+              </option>
+            ))}
+          </select>
+          {customerId && eligiblePhones.length === 0 && phonesData && (
+            <p className="text-xs text-status-warning">No active phones with an attached SIM found for this customer.</p>
+          )}
+        </div>
+      )}
+
+      {/* SIM Card (required for sim_topup) */}
+      {needsSim && !isCustomer && (
+        <div className="space-y-1.5">
+          <Label htmlFor="sim">
+            SIM Card
+            {' '}<span className="text-text-disabled text-xs font-normal">(required for this type)</span>
+          </Label>
+          <select
+            id="sim"
+            className={NATIVE_SELECT_CLS}
+            value={simCardId}
+            onChange={e => setSimCardId(e.target.value)}
+            disabled={!customerId}
+          >
+            <option value="">{customerId ? 'Select SIM card' : 'Select customer first'}</option>
+            {eligibleSims.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.type} — {s.provider ?? 'Unknown'}{s.number ? ` · ${s.number}` : ''} · €{s.base_monthly_fee}/mo
+              </option>
+            ))}
+          </select>
+          {customerId && eligibleSims.length === 0 && simsData && (
+            <p className="text-xs text-status-warning">No active SIM cards assigned to a phone found for this customer.</p>
+          )}
+        </div>
+      )}
+
+      {/* New SIM fields */}
+      {isNewSim && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="simProvider">Provider</Label>
+            <select
+              id="simProvider"
+              className={NATIVE_SELECT_CLS}
+              value={simProvider}
+              onChange={e => setSimProvider(e.target.value as SimProvider | '')}
+            >
+              <option value="">Select provider</option>
+              {SIM_PROVIDERS.map(p => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="simTypeSel">SIM type</Label>
+            <select
+              id="simTypeSel"
+              className={NATIVE_SELECT_CLS}
+              value={simType}
+              onChange={e => setSimType(e.target.value as 'prepaid' | 'postpaid' | '')}
+            >
+              <option value="">Select type</option>
+              <option value="prepaid">Prepaid</option>
+              <option value="postpaid">Postpaid</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding: new customer fields */}
+      {isOnboarding && (
+        <div className="space-y-4">
+          <p className="text-sm text-text-secondary">
+            Fill in the new customer details. A customer account will be created on submit.
+          </p>
+          <div className="space-y-1.5">
+            <Label htmlFor="onboardName">
+              Customer name <span className="text-status-error">*</span>
+            </Label>
+            <input
+              id="onboardName"
+              type="text"
+              className={INPUT_CLS}
+              value={onboardingName}
+              onChange={e => setOnboardingName(e.target.value)}
+              placeholder="e.g. TechCorp ME"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="onboardContact">Contact info</Label>
+            <input
+              id="onboardContact"
+              type="text"
+              className={INPUT_CLS}
+              value={onboardingContact}
+              onChange={e => setOnboardingContact(e.target.value)}
+              placeholder="Email, phone, or other contact"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="onboardWhatsapp">WhatsApp group ID</Label>
+            <input
+              id="onboardWhatsapp"
+              type="text"
+              className={INPUT_CLS}
+              value={onboardingWhatsapp}
+              onChange={e => setOnboardingWhatsapp(e.target.value)}
+              placeholder="Optional — enables WhatsApp notifications"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Notes */}
+      <div className="space-y-1.5">
+        <Label htmlFor="notes">
+          {isOnboarding ? 'Provisioning notes' : isNewSim ? 'Additional notes' : 'Notes'}
+          {' '}<span className="text-text-disabled text-xs font-normal">(optional)</span>
+        </Label>
+        <textarea
+          id="notes"
+          className={TEXTAREA_CLS}
+          rows={4}
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          placeholder={
+            isOnboarding
+              ? 'Phones and SIM cards to provision, special instructions…'
+              : isNewSim
+              ? 'Any additional instructions…'
+              : 'Describe the issue or request…'
+          }
+        />
+      </div>
+
+      {error && (
+        <p className="text-sm text-status-error bg-status-error/5 border border-status-error/20 rounded-lg px-4 py-2">
+          {error}
+        </p>
+      )}
+
+      <div className="flex gap-3 pt-1">
+        <Button type="button" variant="outline" onClick={() => onCancel ? onCancel() : router.push('/requests')}>
+          Cancel
+        </Button>
+        <Button type="submit" loading={submitting}>
+          Submit request
+        </Button>
+      </div>
+    </div>
+  )
+
+  if (embedded) {
+    return <form onSubmit={handleSubmit}>{fields}</form>
+  }
+
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl">
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border bg-surface-raised">
+        <div className="px-6 py-4 border-b border-border bg-bg-secondary">
           <h2 className="text-sm font-semibold text-text-primary">Request details</h2>
         </div>
-        <div className="px-6 py-5 space-y-5">
-
-          {/* Type + Customer row */}
-          <div className={`grid gap-4 ${!isCustomer && !isOnboarding ? 'grid-cols-2' : 'grid-cols-1 max-w-xs'}`}>
-            <div className="space-y-1.5">
-              <Label htmlFor="type">Request type</Label>
-              <select
-                id="type"
-                className={NATIVE_SELECT_CLS}
-                value={type}
-                onChange={e => handleTypeChange(e.target.value as RequestType)}
-              >
-                {REQUEST_TYPES.map(rt => (
-                  <option key={rt.value} value={rt.value}>{rt.label}</option>
-                ))}
-              </select>
-            </div>
-
-            {!isCustomer && !isOnboarding && (
-              <div className="space-y-1.5">
-                <Label htmlFor="customer">Customer</Label>
-                <select
-                  id="customer"
-                  className={NATIVE_SELECT_CLS}
-                  value={customerId}
-                  onChange={e => handleCustomerChange(e.target.value)}
-                  disabled={customersLoading}
-                >
-                  <option value="">
-                    {customersLoading ? 'Loading…' : 'Select customer'}
-                  </option>
-                  {customers?.content.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
-
-          {/* Phone (required for phone_repair / phone_replacement) */}
-          {needsPhone && !isCustomer && (
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">
-                Phone
-                {' '}<span className="text-text-disabled text-xs font-normal">(required for this type)</span>
-              </Label>
-              <select
-                id="phone"
-                className={NATIVE_SELECT_CLS}
-                value={phoneId}
-                onChange={e => setPhoneId(e.target.value)}
-                disabled={!customerId}
-              >
-                <option value="">{customerId ? 'Select phone' : 'Select customer first'}</option>
-                {eligiblePhones.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.model}
-                    {p.sim_card ? ` — ${p.sim_card.provider ?? ''} ${p.sim_card.number ?? ''}`.trim() : ''}
-                  </option>
-                ))}
-              </select>
-              {customerId && eligiblePhones.length === 0 && phonesData && (
-                <p className="text-xs text-status-warning">No active phones with an attached SIM found for this customer.</p>
-              )}
-            </div>
-          )}
-
-          {/* SIM Card (required for sim_topup) */}
-          {needsSim && !isCustomer && (
-            <div className="space-y-1.5">
-              <Label htmlFor="sim">
-                SIM Card
-                {' '}<span className="text-text-disabled text-xs font-normal">(required for this type)</span>
-              </Label>
-              <select
-                id="sim"
-                className={NATIVE_SELECT_CLS}
-                value={simCardId}
-                onChange={e => setSimCardId(e.target.value)}
-                disabled={!customerId}
-              >
-                <option value="">{customerId ? 'Select SIM card' : 'Select customer first'}</option>
-                {eligibleSims.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.type} — {s.provider ?? 'Unknown'}{s.number ? ` · ${s.number}` : ''} · €{s.base_monthly_fee}/mo
-                  </option>
-                ))}
-              </select>
-              {customerId && eligibleSims.length === 0 && simsData && (
-                <p className="text-xs text-status-warning">No active SIM cards assigned to a phone found for this customer.</p>
-              )}
-            </div>
-          )}
-
-          {/* New SIM fields */}
-          {isNewSim && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="simProvider">Provider</Label>
-                <select
-                  id="simProvider"
-                  className={NATIVE_SELECT_CLS}
-                  value={simProvider}
-                  onChange={e => setSimProvider(e.target.value as SimProvider | '')}
-                >
-                  <option value="">Select provider</option>
-                  {SIM_PROVIDERS.map(p => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="simTypeSel">SIM type</Label>
-                <select
-                  id="simTypeSel"
-                  className={NATIVE_SELECT_CLS}
-                  value={simType}
-                  onChange={e => setSimType(e.target.value as 'prepaid' | 'postpaid' | '')}
-                >
-                  <option value="">Select type</option>
-                  <option value="prepaid">Prepaid</option>
-                  <option value="postpaid">Postpaid</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {/* Onboarding: new customer fields */}
-          {isOnboarding && (
-            <div className="space-y-4">
-              <p className="text-sm text-text-secondary">
-                Fill in the new customer details. A customer account will be created on submit.
-              </p>
-              <div className="space-y-1.5">
-                <Label htmlFor="onboardName">
-                  Customer name <span className="text-status-error">*</span>
-                </Label>
-                <input
-                  id="onboardName"
-                  type="text"
-                  className={INPUT_CLS}
-                  value={onboardingName}
-                  onChange={e => setOnboardingName(e.target.value)}
-                  placeholder="e.g. TechCorp ME"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="onboardContact">Contact info</Label>
-                <input
-                  id="onboardContact"
-                  type="text"
-                  className={INPUT_CLS}
-                  value={onboardingContact}
-                  onChange={e => setOnboardingContact(e.target.value)}
-                  placeholder="Email, phone, or other contact"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="onboardWhatsapp">WhatsApp group ID</Label>
-                <input
-                  id="onboardWhatsapp"
-                  type="text"
-                  className={INPUT_CLS}
-                  value={onboardingWhatsapp}
-                  onChange={e => setOnboardingWhatsapp(e.target.value)}
-                  placeholder="Optional — enables WhatsApp notifications"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Notes */}
-          <div className="space-y-1.5">
-            <Label htmlFor="notes">
-              {isOnboarding ? 'Provisioning notes' : isNewSim ? 'Additional notes' : 'Notes'}
-              {' '}<span className="text-text-disabled text-xs font-normal">(optional)</span>
-            </Label>
-            <textarea
-              id="notes"
-              className={TEXTAREA_CLS}
-              rows={4}
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder={
-                isOnboarding
-                  ? 'Phones and SIM cards to provision, special instructions…'
-                  : isNewSim
-                  ? 'Any additional instructions…'
-                  : 'Describe the issue or request…'
-              }
-            />
-          </div>
-
-          {error && (
-            <p className="text-sm text-status-error bg-status-error/5 border border-status-error/20 rounded-lg px-4 py-2">
-              {error}
-            </p>
-          )}
-
-          <div className="flex gap-3 pt-1">
-            <Button type="button" variant="outline" onClick={() => router.push('/requests')}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Submit request'}
-            </Button>
-          </div>
-        </div>
+        {fields}
       </div>
     </form>
   )

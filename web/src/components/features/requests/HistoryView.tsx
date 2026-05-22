@@ -71,7 +71,7 @@ export function HistoryView() {
       {/* Desktop table */}
       <div className="hidden sm:block border border-border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-surface-raised border-b border-border">
+          <thead className="bg-bg-secondary border-b border-border">
             <tr>
               <th className="px-4 py-3 text-left text-text-secondary font-medium">Type</th>
               <th className="px-4 py-3 text-left text-text-secondary font-medium">Customer</th>
@@ -85,7 +85,7 @@ export function HistoryView() {
               <tr key={i}>
                 {Array.from({ length: 5 }).map((__, j) => (
                   <td key={j} className="px-4 py-3">
-                    <div className={`h-4 bg-surface-raised rounded animate-pulse ${j === 4 ? 'w-12' : 'w-20'}`} />
+                    <div className={`h-4 bg-bg-secondary rounded animate-pulse ${j === 4 ? 'w-12' : 'w-20'}`} />
                   </td>
                 ))}
               </tr>
@@ -96,7 +96,7 @@ export function HistoryView() {
               </tr>
             )}
             {data?.content.map(req => (
-              <tr key={req.id} className="hover:bg-surface-raised transition-colors">
+              <tr key={req.id} className="hover:bg-bg-secondary transition-colors">
                 <td className="px-4 py-3 text-text-primary">{TYPE_LABELS[req.type] ?? req.type}</td>
                 <td className="px-4 py-3 text-text-secondary">{req.customer_name}</td>
                 <td className="px-4 py-3 font-mono text-text-secondary">
@@ -123,8 +123,8 @@ export function HistoryView() {
       <div className="sm:hidden space-y-2">
         {isLoading && Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="bg-surface border border-border rounded-xl p-4 space-y-2 animate-pulse">
-            <div className="h-4 bg-surface-raised rounded w-1/2" />
-            <div className="h-3 bg-surface-raised rounded w-3/4" />
+            <div className="h-4 bg-bg-secondary rounded w-1/2" />
+            <div className="h-3 bg-bg-secondary rounded w-3/4" />
           </div>
         ))}
         {!isLoading && data?.content.length === 0 && <EmptyState />}

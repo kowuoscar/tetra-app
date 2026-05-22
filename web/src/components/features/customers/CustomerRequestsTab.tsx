@@ -45,10 +45,10 @@ export function CustomerRequestsTab({ customerId, doneOnly }: Props) {
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="bg-surface border border-border rounded-xl p-4 space-y-2">
             <div className="flex justify-between">
-              <div className="h-4 bg-surface-raised rounded w-1/3" />
-              <div className="h-5 bg-surface-raised rounded-full w-20" />
+              <div className="h-4 bg-bg-secondary rounded w-1/3" />
+              <div className="h-5 bg-bg-secondary rounded-full w-20" />
             </div>
-            <div className="h-3 bg-surface-raised rounded w-1/2" />
+            <div className="h-3 bg-bg-secondary rounded w-1/2" />
           </div>
         ))}
       </div>
@@ -83,7 +83,7 @@ export function CustomerRequestsTab({ customerId, doneOnly }: Props) {
       {/* Desktop table */}
       <div className="hidden sm:block border border-border rounded-xl overflow-hidden text-sm">
         <table className="w-full">
-          <thead className="bg-surface-raised border-b border-border">
+          <thead className="bg-bg-secondary border-b border-border">
             <tr>
               <th className="px-4 py-3 text-left text-text-secondary font-medium">Type</th>
               <th className="px-4 py-3 text-left text-text-secondary font-medium">Status</th>
@@ -94,7 +94,7 @@ export function CustomerRequestsTab({ customerId, doneOnly }: Props) {
           </thead>
           <tbody className="divide-y divide-border">
             {data.content.map(req => (
-              <tr key={req.id} className="hover:bg-surface-raised transition-colors">
+              <tr key={req.id} className="hover:bg-bg-secondary transition-colors">
                 <td className="px-4 py-3 text-text-primary">{TYPE_LABELS[req.type] ?? req.type}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[req.status] ?? ''}`}>

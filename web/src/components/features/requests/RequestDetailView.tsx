@@ -53,7 +53,7 @@ function StatusStepper({ status }: { status: RequestStatus }) {
                     ? 'bg-status-success/10 text-status-success'
                     : isActive
                     ? 'bg-brand-primary text-white'
-                    : 'bg-surface-raised text-text-disabled',
+                    : 'bg-bg-secondary text-text-disabled',
                 ].join(' ')}
               >
                 {isPast ? '✓' : i + 1}
@@ -139,8 +139,8 @@ export function RequestDetailView({ requestId }: Props) {
     return (
       <div className="space-y-5 max-w-5xl animate-pulse">
         <div className="bg-surface border border-border rounded-xl px-6 py-5 space-y-3">
-          <div className="h-5 bg-surface-raised rounded w-40" />
-          <div className="h-4 bg-surface-raised rounded w-64" />
+          <div className="h-5 bg-bg-secondary rounded w-40" />
+          <div className="h-4 bg-bg-secondary rounded w-64" />
         </div>
         <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
           <div className="space-y-4">
@@ -252,7 +252,7 @@ export function RequestDetailView({ requestId }: Props) {
             </div>
             {req.parts.length > 0 ? (
               <table className="w-full text-sm">
-                <thead className="bg-surface-raised text-text-secondary">
+                <thead className="bg-bg-secondary text-text-secondary">
                   <tr>
                     <th className="px-5 py-2.5 text-left font-medium text-xs uppercase tracking-wide">Description</th>
                     <th className="px-5 py-2.5 text-left font-medium text-xs uppercase tracking-wide">Cost</th>
@@ -276,7 +276,7 @@ export function RequestDetailView({ requestId }: Props) {
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-surface-raised">
+                  <tr className="bg-bg-secondary">
                     <td className="px-5 py-2.5 text-xs text-text-secondary font-medium">Total parts</td>
                     <td className="px-5 py-2.5 font-mono text-sm font-semibold text-text-primary">€{totalPartsAmount.toFixed(2)}</td>
                     <td />
@@ -288,7 +288,7 @@ export function RequestDetailView({ requestId }: Props) {
             )}
 
             {addingPart && (
-              <div className="px-5 py-4 border-t border-border space-y-3 bg-surface-raised">
+              <div className="px-5 py-4 border-t border-border space-y-3 bg-bg-secondary">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs">Description</Label>
@@ -397,7 +397,7 @@ export function RequestDetailView({ requestId }: Props) {
                     <button
                       key={a.id}
                       onClick={() => downloadAttachment(requestId, a.id)}
-                      className="aspect-square rounded-lg border border-border bg-surface-raised flex items-center justify-center text-xs font-mono font-medium text-text-secondary hover:border-brand-primary hover:text-brand-primary transition-colors"
+                      className="aspect-square rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-xs font-mono font-medium text-text-secondary hover:border-brand-primary hover:text-brand-primary transition-colors"
                       title={`Uploaded ${new Date(a.created_at).toLocaleDateString()}`}
                     >
                       IMG
@@ -416,7 +416,7 @@ export function RequestDetailView({ requestId }: Props) {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-raised transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary hover:bg-bg-secondary transition-colors disabled:opacity-50"
               >
                 {uploading ? 'Uploading…' : '+ Upload photo'}
               </button>

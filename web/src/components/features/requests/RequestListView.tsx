@@ -87,7 +87,7 @@ function TableSkeleton({ cols }: { cols: number }) {
         <tr key={i} className="border-b border-border last:border-0">
           {Array.from({ length: cols }).map((__, j) => (
             <td key={j} className="px-4 py-3">
-              <div className={`h-4 bg-surface-raised rounded animate-pulse ${j === 0 ? 'w-28' : j === cols - 1 ? 'w-12' : 'w-20'}`} />
+              <div className={`h-4 bg-bg-secondary rounded animate-pulse ${j === 0 ? 'w-28' : j === cols - 1 ? 'w-12' : 'w-20'}`} />
             </td>
           ))}
         </tr>
@@ -180,7 +180,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
       {/* Desktop table */}
       <div className="hidden sm:block border border-border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-surface-raised border-b border-border">
+          <thead className="bg-bg-secondary border-b border-border">
             <tr>
               <th className="px-4 py-3 text-left text-text-secondary font-medium">Type</th>
               {hasCustomerCol && (
@@ -203,7 +203,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
               </tr>
             )}
             {data?.content.map(req => (
-              <tr key={req.id} className="hover:bg-surface-raised transition-colors">
+              <tr key={req.id} className="hover:bg-bg-secondary transition-colors">
                 <td className="px-4 py-3">
                   <Link
                     href={`/requests/${req.id}`}
@@ -216,7 +216,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
                   <td className="px-4 py-3 text-text-secondary">{req.customer_name}</td>
                 )}
                 <td className="px-4 py-3">
-                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-surface-raised border border-border text-text-secondary capitalize">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-bg-secondary border border-border text-text-secondary capitalize">
                     {req.author}
                   </span>
                 </td>
@@ -250,10 +250,10 @@ export function RequestListView({ customerId }: { customerId?: string }) {
         {isLoading && Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="bg-surface border border-border rounded-xl p-4 space-y-2 animate-pulse">
             <div className="flex justify-between">
-              <div className="h-4 bg-surface-raised rounded w-1/2" />
-              <div className="h-5 bg-surface-raised rounded-full w-16" />
+              <div className="h-4 bg-bg-secondary rounded w-1/2" />
+              <div className="h-5 bg-bg-secondary rounded-full w-16" />
             </div>
-            <div className="h-3 bg-surface-raised rounded w-3/4" />
+            <div className="h-3 bg-bg-secondary rounded w-3/4" />
           </div>
         ))}
         {!isLoading && data?.content.length === 0 && (
