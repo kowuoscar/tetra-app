@@ -1,5 +1,6 @@
 package com.tetramobile.tetra.shared.exception;
 
+import com.tetramobile.tetra.storage.StorageException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -75,6 +76,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileTooLarge(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(ErrorResponse.of("file_too_large", "File exceeds 10 MB limit"));
+    }
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<ErrorResponse> handleStorage(StorageException ex) {
+        log.error("Storage error", ex);
+        return ResponseEntity.status(502)
+                .body(ErrorResponse.of("storage_error", "File storage unavailable"));
     }
 
     @ExceptionHandler(Exception.class)

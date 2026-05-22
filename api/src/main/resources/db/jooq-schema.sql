@@ -38,6 +38,8 @@ CREATE TABLE sim_cards (
     customer_id       UUID NOT NULL REFERENCES customers(id),
     phone_id          UUID REFERENCES phones(id),
     status            VARCHAR NOT NULL DEFAULT 'active' CHECK (status IN ('active','unassigned','cancelled')),
+    provider          VARCHAR(20),
+    number            VARCHAR(20),
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -60,6 +62,7 @@ CREATE TABLE requests (
     fee         NUMERIC(10,2),
     notes       TEXT,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     done_at     TIMESTAMP
 );
 
@@ -67,14 +70,17 @@ CREATE TABLE request_parts (
     id          UUID PRIMARY KEY DEFAULT random_uuid(),
     request_id  UUID NOT NULL REFERENCES requests(id),
     description VARCHAR NOT NULL,
-    cost        NUMERIC(10,2) NOT NULL
+    cost        NUMERIC(10,2) NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE attachments (
     id                  UUID PRIMARY KEY DEFAULT random_uuid(),
     request_id          UUID NOT NULL REFERENCES requests(id),
     storage_key         VARCHAR NOT NULL,
-    uploaded_by_user_id UUID NOT NULL REFERENCES users(id),
+    original_filename   VARCHAR(255),
+    content_type        VARCHAR(100),
+    uploaded_by_user_id UUID REFERENCES users(id),
     created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

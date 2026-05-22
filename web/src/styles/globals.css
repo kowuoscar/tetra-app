@@ -265,3 +265,7 @@
   --z-index-popover:  450;
   --z-index-toast:    500;
 }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
