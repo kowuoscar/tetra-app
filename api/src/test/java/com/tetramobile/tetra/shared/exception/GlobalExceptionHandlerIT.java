@@ -4,6 +4,8 @@ import com.tetramobile.tetra.auth.AuthService;
 import com.tetramobile.tetra.customer.CustomerService;
 import com.tetramobile.tetra.dashboard.DashboardService;
 import com.tetramobile.tetra.phone.PhoneService;
+import com.tetramobile.tetra.request.AttachmentService;
+import com.tetramobile.tetra.request.RequestService;
 import com.tetramobile.tetra.shared.security.JwtTokenProvider;
 import com.tetramobile.tetra.simcard.SimCardService;
 import com.tetramobile.tetra.user.UserService;
@@ -47,6 +49,12 @@ class GlobalExceptionHandlerIT {
 
     @MockBean
     private DashboardService dashboardService;
+
+    @MockBean
+    private RequestService requestService;
+
+    @MockBean
+    private AttachmentService attachmentService;
 
     @Autowired
     private MockMvc mockMvc;

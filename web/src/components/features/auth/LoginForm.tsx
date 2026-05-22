@@ -11,8 +11,8 @@ type LoginState = 'idle' | 'submitting' | 'error'
 type ErrorCode = 'invalid_credentials' | 'account_deactivated' | 'unknown'
 
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
-  invalid_credentials: 'Invalid email or password',
-  account_deactivated: 'Your account has been deactivated',
+  invalid_credentials: 'Invalid email or password.',
+  account_deactivated: 'Your account has been deactivated.',
   unknown: 'Something went wrong. Please try again.',
 }
 
@@ -42,10 +42,15 @@ export function LoginForm() {
     }
   }
 
+  const hasError = state === 'error'
+
   return (
     <form onSubmit={handleSubmit} className="bg-surface shadow-md rounded-xl p-8 space-y-5">
-      {state === 'error' && (
-        <div className="bg-status-error-bg text-status-error border border-status-error/20 rounded-md px-4 py-3 text-sm">
+      {hasError && (
+        <div className="bg-status-errorBg text-status-error border border-status-error/20 rounded-lg px-4 py-3 text-sm flex items-start gap-2.5">
+          <svg className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
           {ERROR_MESSAGES[errorCode]}
         </div>
       )}
@@ -60,6 +65,7 @@ export function LoginForm() {
           required
           disabled={state === 'submitting'}
           placeholder="you@example.com"
+          className={hasError ? 'border-status-error focus-visible:ring-status-error/30' : ''}
         />
       </div>
 
@@ -72,6 +78,7 @@ export function LoginForm() {
           autoComplete="current-password"
           required
           disabled={state === 'submitting'}
+          className={hasError ? 'border-status-error focus-visible:ring-status-error/30' : ''}
         />
       </div>
 

@@ -23,6 +23,9 @@ export async function apiClient<T>(
     ...options,
   })
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      window.location.href = '/login'
+    }
     const body = await res.json().catch(() => ({}))
     const errorObj = body.error ?? body
     throw Object.assign(new Error(errorObj.message ?? 'Request failed'), {

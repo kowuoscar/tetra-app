@@ -11,12 +11,12 @@ describe('Button', () => {
     expect(el.className).toContain('hover:bg-brand-hover')
   })
 
-  it('outline variant uses border and transparent background', () => {
+  it('outline variant uses border and surface background', () => {
     render(<Button variant="outline">Outline</Button>)
     const el = screen.getByRole('button', { name: 'Outline' })
     expect(el.className).toContain('border-border')
-    expect(el.className).toContain('bg-transparent')
-    expect(el.className).toContain('hover:bg-bg-tertiary')
+    expect(el.className).toContain('bg-surface')
+    expect(el.className).toContain('hover:bg-bg-secondary')
   })
 
   it('ghost variant uses tertiary hover', () => {
