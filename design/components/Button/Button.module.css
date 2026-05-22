@@ -1,0 +1,108 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all var(--duration-fast) var(--easing-default);
+  min-height: 36px;
+  padding: var(--space-2) var(--space-4);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sizes */
+.button[data-size="sm"] {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-3);
+  min-height: 28px;
+}
+
+.button[data-size="lg"] {
+  font-size: var(--font-size-md);
+  padding: var(--space-3) var(--space-6);
+  min-height: 44px;
+}
+
+/* Variants */
+.button[data-variant="primary"] {
+  background: var(--color-brand-primary);
+  color: #fff;
+  border-color: var(--color-brand-primary);
+}
+
+.button[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+.button[data-variant="secondary"] {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--color-background-secondary);
+  border-color: var(--color-border-strong);
+}
+
+.button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.button[data-variant="ghost"]:hover:not(:disabled) {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+}
+
+.button[data-variant="destructive"] {
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error);
+  border-color: transparent;
+}
+
+.button[data-variant="destructive"]:hover:not(:disabled) {
+  background: var(--color-red-100);
+}
+
+[data-theme="dark"] .button[data-variant="destructive"]:hover:not(:disabled) {
+  background: var(--color-status-error-bg);
+}
+
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+  animation: spin var(--duration-slow) linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

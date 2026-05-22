@@ -42,7 +42,8 @@ These rules apply to every agent session without exception. Do not deviate from 
 22. **Admin seed user** is created by Flyway V1 migration (email: `admin@tetramobile.ae`, password in migration). Do not hardcode credentials anywhere else.
 23. **Request field names (contracts.md exact):** `notes` (not `description`), `author` (customer|company — derived from caller role, never in request body), `fee` (nullable BigDecimal, admin-sets via PATCH — not computed from parts). `RequestPart`: `description` + `cost` (not `name`/`fee`). Attachments: max 10 MB, image/jpeg/png/webp only; `AttachmentSummary = {id, uploaded_by_user_id, created_at}` — no filename or download URL in payload.
 24. **Invoice is company-wide:** one invoice per calendar month for Tetra Mobile Solutions FZ-LLC — NOT per-customer. Fields: `support_fees` (admin sets), `support_expenses` (frozen at send = all SIM fees + request part costs), `rolling_advance_current` (admin+company), `rolling_advance_previous` (auto-carry), `previous_balance` (auto-carry from prior unpaid), `taxes` (always 0). No `InvoiceLineItem` entity. No `customer_id` on Invoice.
-25. **System settings** hold bank/payment details for invoice PDFs: `bank_account_holder`, `bank_iban`, `bank_swift`, `company_name`, `company_address`. Singleton row UUID `00000000-0000-0000-0000-000000000001`. Endpoint is `PUT /settings` (full replace, all fields required). WhatsApp group IDs are per-customer (on `customers` table), not in system settings.
+25. **System settings** hold bank/payment details for invoice PDFs:
+26. **Component library:** never reimplement a component that exists in `design/components/` — import it instead. Every new UI component must have a co-located `.stories.tsx` file. `bank_account_holder`, `bank_iban`, `bank_swift`, `company_name`, `company_address`. Singleton row UUID `00000000-0000-0000-0000-000000000001`. Endpoint is `PUT /settings` (full replace, all fields required). WhatsApp group IDs are per-customer (on `customers` table), not in system settings.
 
 ---
 
@@ -56,7 +57,10 @@ These rules apply to every agent session without exception. Do not deviate from 
 | `docs/drift-report.md` | Drift between code and specs found during plan-02p evolve scan |
 | `design/brief.md` | Design direction, typography, color intent, component patterns |
 | `design/tokens.md` | Complete token system — CSS custom properties + Tailwind config |
-| `design/preview.html` | Interactive component gallery and page layouts |
+| `design/components/` | Canonical component implementations — ground truth for all UI |
+| `design/preview.html.archived` | Archived interactive gallery — superseded by Storybook |
+| `web/.storybook/` | Storybook configuration — run `pnpm storybook:dev` to browse |
+| `docs/design-drift-report.md` | Design system drift audit and fix history |
 | `specs/frontend.md` | Pages, component inventory, navigation, state management |
 | `specs/backend.md` | Services, business rules, invariants, data layer, security |
 | `specs/infrastructure.md` | Environments, Kubernetes manifests, CI/CD, secrets, observability |

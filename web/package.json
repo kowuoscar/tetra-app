@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "storybook:dev": "storybook dev -p 6006",
+    "storybook:build": "storybook build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -27,6 +29,12 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@storybook/addon-a11y": "^10.4.0",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/addon-themes": "^10.4.0",
+    "@storybook/nextjs": "^10.4.0",
+    "@storybook/test": "^8.6.15",
     "@tailwindcss/postcss": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -38,6 +46,7 @@
     "eslint-config-next": "^15.5.18",
     "happy-dom": "^20.9.0",
     "postcss": "^8.5.14",
+    "storybook": "^10.4.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5",
     "vitest": "^4.1.6"
