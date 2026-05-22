@@ -45,7 +45,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.18",
     "happy-dom": "^20.9.0",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.15",
     "storybook": "^10.4.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5",
