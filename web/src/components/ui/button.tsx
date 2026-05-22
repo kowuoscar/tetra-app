@@ -8,26 +8,26 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:     "bg-brand-primary text-white hover:bg-brand-hover",
-        outline:     "border-border bg-transparent hover:bg-bg-tertiary hover:text-text-primary",
-        secondary:   "bg-bg-tertiary text-text-primary hover:bg-bg-secondary",
+        primary:     "bg-brand-primary text-white hover:bg-brand-hover",
+        secondary:   "border-border bg-surface text-text-primary hover:bg-bg-secondary",
+        outline:     "border-border bg-surface text-text-primary hover:bg-bg-secondary",
         ghost:       "hover:bg-bg-tertiary hover:text-text-primary",
         destructive: "bg-status-error-bg text-status-error hover:bg-status-error-bg/80",
         link:        "text-brand-primary underline-offset-4 hover:underline",
       },
       size: {
-        default:   "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        default:   "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         xs:        "h-6 gap-1 rounded-md px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm:        "h-7 gap-1 rounded-md px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg:        "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon:      "size-8",
+        lg:        "h-11 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        icon:      "size-9",
         "icon-xs": "size-6 rounded-md in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-7 rounded-md in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
+        "icon-lg": "size-11",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   }
@@ -35,16 +35,27 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant = "default",
+  variant = "primary",
   size = "default",
+  loading,
+  children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { loading?: boolean }) {
   return (
     <ButtonPrimitive
       data-slot="button"
+      disabled={loading || props.disabled}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    />
+    >
+      {loading && (
+        <svg className="animate-spin size-4 shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      )}
+      {children}
+    </ButtonPrimitive>
   )
 }
 

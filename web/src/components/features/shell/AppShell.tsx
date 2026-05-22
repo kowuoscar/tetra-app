@@ -76,11 +76,15 @@ function BottomNavIcon({ href }: { href: string }) {
   return null
 }
 
+type Crumb = { label: string; href?: string }
+
 export function AppShell({
   user,
+  breadcrumb,
   children,
 }: {
   user: UserSummary
+  breadcrumb?: Crumb[]
   children: React.ReactNode
 }) {
   const pathname = usePathname()
@@ -88,6 +92,8 @@ export function AppShell({
 
   const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(user.role))
   const bottomNavItems = user.role === 'customer' ? BOTTOM_NAV_CUSTOMER : BOTTOM_NAV_STAFF
+  const initials = user.name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
+  const roleLabel = user.role === 'admin' ? 'Admin' : user.role === 'company' ? 'Company' : 'Customer'
 
   async function handleLogout() {
     try {
@@ -102,11 +108,17 @@ export function AppShell({
   return (
     <div className="flex h-screen bg-bg-secondary">
       {/* Sidebar — desktop only */}
-      <aside className="hidden md:flex w-64 flex-shrink-0 bg-surface border-r border-border flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-border">
-          <span className="text-lg font-semibold text-text-primary">Tetra</span>
+      <aside className="hidden md:flex w-[220px] flex-shrink-0 bg-surface border-r border-border flex-col">
+        {/* Brand mark */}
+        <div className="h-[52px] flex items-center px-5 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-brand-primary flex items-center justify-center">
+              <span className="text-white text-xs font-bold leading-none">T</span>
+            </div>
+            <span className="text-sm font-semibold text-text-primary tracking-tight">Tetra</span>
+          </div>
         </div>
-        <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
           {visibleItems.map(item => {
             const active = pathname === item.href || pathname.startsWith(item.href + '/')
             return (
@@ -125,15 +137,42 @@ export function AppShell({
             )
           })}
         </nav>
+        {/* User + role badge */}
+        <div className="px-4 py-3 border-t border-border flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-brand-secondary flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-semibold text-brand-primary">{initials}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-text-primary truncate">{user.name}</p>
+            <p className="text-xs text-text-secondary">{roleLabel}</p>
+          </div>
+        </div>
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top header */}
-        <header className="h-16 flex-shrink-0 bg-surface border-b border-border flex items-center justify-between px-4 md:px-6 gap-4">
-          <span className="text-base font-semibold text-text-primary md:hidden">Tetra</span>
-          <div className="hidden md:block" />
+        <header className="h-[52px] flex-shrink-0 bg-surface border-b border-border flex items-center justify-between px-4 md:px-6 gap-4">
+          {/* Mobile brand / desktop breadcrumb */}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-base font-semibold text-text-primary md:hidden">Tetra</span>
+            {breadcrumb && breadcrumb.length > 0 && (
+              <nav className="hidden md:flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
+                {breadcrumb.map((crumb, i) => (
+                  <span key={i} className="flex items-center gap-1.5">
+                    {i > 0 && <span className="text-text-disabled">/</span>}
+                    {crumb.href ? (
+                      <Link href={crumb.href} className="text-text-secondary hover:text-text-primary transition-colors">
+                        {crumb.label}
+                      </Link>
+                    ) : (
+                      <span className="text-text-primary font-medium">{crumb.label}</span>
+                    )}
+                  </span>
+                ))}
+              </nav>
+            )}
+          </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-text-secondary hidden sm:block">{user.name}</span>
             <button
               onClick={handleLogout}
               className="text-sm text-text-secondary hover:text-text-primary transition-colors"
