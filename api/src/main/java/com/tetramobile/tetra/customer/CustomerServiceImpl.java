@@ -30,7 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     public CustomerDetailResponse createCustomer(CreateCustomerRequest request) {
         Customer customer = new Customer();
-        customer.setName(request.name());
+        customer.setName(request.name().toLowerCase());
         customer.setContactInfo(request.contactInfo());
         customer.setWhatsappGroupId(request.whatsappGroupId());
         return CustomerDetailResponse.from(customerRepository.save(customer));

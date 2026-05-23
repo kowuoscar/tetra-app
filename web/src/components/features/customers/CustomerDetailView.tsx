@@ -13,39 +13,43 @@ import { CustomerPhonesTab } from './CustomerPhonesTab'
 import { CustomerSimCardsTab } from './CustomerSimCardsTab'
 import { CustomerCostBreakdownTab } from './CustomerCostBreakdownTab'
 import { CustomerRequestsTab } from './CustomerRequestsTab'
+import { NewRequestModal } from '@/components/features/requests/NewRequestModal'
 import type { CustomerDetail } from '@/types'
 
 type Tab = 'phones' | 'sims' | 'requests' | 'costs' | 'time'
 
-const ALL_TABS: { id: Tab; label: string; adminOnly?: boolean }[] = [
-  { id: 'phones', label: 'Phones' },
-  { id: 'sims', label: 'SIM Cards' },
-  { id: 'requests', label: 'Requests' },
-  { id: 'costs', label: 'Cost Breakdown' },
-  { id: 'time', label: 'Time Tracking', adminOnly: true },
+const ALL_TABS: { id: Tab; label: string; mobileLabel: string; adminOnly?: boolean }[] = [
+  { id: 'phones',   label: 'Phones',         mobileLabel: 'Phones'   },
+  { id: 'sims',     label: 'SIM Cards',       mobileLabel: 'SIMs'     },
+  { id: 'requests', label: 'Requests',        mobileLabel: 'Requests' },
+  { id: 'costs',    label: 'Cost Breakdown',  mobileLabel: 'Costs'    },
+  { id: 'time',     label: 'Time Tracking',   mobileLabel: 'Time',    adminOnly: true },
 ]
 
 export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
   const isAdmin = useAuthStore((s) => s.isAdmin())
   const [activeTab, setActiveTab] = useState<Tab>('phones')
   const [showEdit, setShowEdit] = useState(false)
+  const [showNewRequest, setShowNewRequest] = useState(false)
 
   const tabs = ALL_TABS.filter((t) => !t.adminOnly || isAdmin)
 
+  const formattedCost = new Intl.NumberFormat('en-US').format(Math.round(customer.current_month_cost))
+
   return (
     <div>
-      {/* Header card */}
-      <div className="bg-surface border border-border rounded-lg px-6 py-5 mb-5 flex items-start justify-between">
+      {/* Desktop header card */}
+      <div className="hidden sm:flex bg-surface border border-border rounded-lg px-6 py-5 mb-5 items-start justify-between">
         <div>
-          <div className="text-xl font-bold text-text-primary mb-1">{customer.name}</div>
+          <div className="text-xl font-bold text-text-primary mb-1 uppercase">{customer.name}</div>
           <div className="flex flex-wrap gap-4 text-sm text-text-secondary mt-0.5">
-            <span>{customer.contact_info}</span>
+            {customer.contact_info && <span>{customer.contact_info}</span>}
             <span>{customer.phone_count} phones</span>
             <span>{customer.sim_card_count} SIM cards</span>
-            <span className="text-status-warning">{customer.open_request_count} open requests</span>
-            <span className="text-text-disabled">
-              €{customer.current_month_cost.toFixed(2)}/mo current
+            <span className={customer.open_request_count > 0 ? 'text-status-warning' : ''}>
+              {customer.open_request_count} open requests
             </span>
+            <span className="text-text-disabled">€{formattedCost}/mo current</span>
           </div>
         </div>
         {isAdmin && (
@@ -53,30 +57,49 @@ export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
             <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
               Edit
             </Button>
-            <a
-              href={`/requests/new?customer_id=${customer.id}`}
-              className="inline-flex items-center px-3 py-1.5 bg-brand-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
-            >
+            <Button size="sm" onClick={() => setShowNewRequest(true)}>
               New request
-            </a>
+            </Button>
           </div>
         )}
       </div>
 
-      {/* Tab nav */}
-      <div className="flex border-b border-border mb-5">
+      {/* Mobile header — full-bleed, shows customer name + Edit + stats */}
+      <div className="sm:hidden -mx-4 mb-0">
+        <div className="flex items-center justify-between px-4 py-3 bg-surface border-b border-border">
+          <span className="text-sm font-semibold text-text-primary uppercase">{customer.name}</span>
+          {isAdmin && (
+            <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>Edit</Button>
+          )}
+        </div>
+        <div className="px-4 py-2.5 bg-surface border-b border-border text-xs text-text-secondary flex flex-wrap gap-x-1.5">
+          {customer.contact_info && <><span>{customer.contact_info}</span><span>·</span></>}
+          <span>{customer.phone_count} phones</span>
+          <span>·</span>
+          <span>{customer.sim_card_count} SIMs</span>
+          <span>·</span>
+          <span className={customer.open_request_count > 0 ? 'text-status-warning' : ''}>
+            {customer.open_request_count} open
+          </span>
+        </div>
+      </div>
+
+      {/* Tab nav — full-bleed on mobile */}
+      <div className="-mx-4 sm:mx-0 flex overflow-x-auto border-b border-border mb-5">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors',
+              'sm:text-sm text-xs',
               activeTab === tab.id
                 ? 'text-brand-primary border-brand-primary'
                 : 'text-text-secondary border-transparent hover:text-text-primary',
             )}
           >
-            {tab.label}
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.mobileLabel}</span>
           </button>
         ))}
       </div>
@@ -96,6 +119,11 @@ export function CustomerDetailView({ customer }: { customer: CustomerDetail }) {
           onClose={() => setShowEdit(false)}
         />
       )}
+      <NewRequestModal
+        open={showNewRequest}
+        onOpenChange={setShowNewRequest}
+        initialCustomerId={customer.id}
+      />
     </div>
   )
 }

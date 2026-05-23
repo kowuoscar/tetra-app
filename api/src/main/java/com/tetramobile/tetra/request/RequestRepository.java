@@ -13,6 +13,8 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
 
     long countByStatusNot(RequestStatus status);
 
+    long countByStatus(RequestStatus status);
+
     long countByCustomerIdAndStatusNot(UUID customerId, RequestStatus status);
 
     @Query("SELECT r FROM Request r WHERE r.customerId = :cid AND r.status = 'done'" +

@@ -6,9 +6,11 @@ import { useAuthStore } from '@/lib/stores/authStore'
 export function NewRequestModal({
   open,
   onOpenChange,
+  initialCustomerId,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
+  initialCustomerId?: string
 }) {
   const user = useAuthStore(s => s.user)
 
@@ -19,7 +21,7 @@ export function NewRequestModal({
         <NewRequestForm
           embedded
           userRole={user?.role ?? 'customer'}
-          initialCustomerId={user?.customer_id ?? undefined}
+          initialCustomerId={initialCustomerId ?? user?.customer_id ?? undefined}
           onCancel={() => onOpenChange(false)}
         />
       </DialogContent>

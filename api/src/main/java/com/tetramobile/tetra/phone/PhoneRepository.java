@@ -17,4 +17,6 @@ public interface PhoneRepository extends JpaRepository<Phone, UUID> {
     boolean existsByIdAndCustomerId(UUID phoneId, UUID customerId);
 
     long countByStatusNot(PhoneStatus status);
+
+    long countByStatus(PhoneStatus status);
 }

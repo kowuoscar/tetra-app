@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getRequests } from '@/lib/data/requests'
 import { getCustomers } from '@/lib/data/customers'
 import { useAuthStore } from '@/lib/stores/authStore'
+import { NewRequestModal } from './NewRequestModal'
 import type { RequestStatus, RequestType } from '@/types'
 
 const STATUS_LABELS: Record<RequestStatus, string> = {
@@ -49,7 +50,7 @@ function formatRelativeTime(dateStr: string): string {
   return `${Math.floor(months / 12)}y ago`
 }
 
-function EmptyState({ filtered }: { filtered: boolean }) {
+function EmptyState({ filtered, onNewRequest }: { filtered: boolean; onNewRequest?: () => void }) {
   return (
     <div className="flex flex-col items-center text-center py-12 px-6">
       <svg
@@ -68,13 +69,13 @@ function EmptyState({ filtered }: { filtered: boolean }) {
           ? 'No requests match the current filters.'
           : 'Submit a new service request to get started.'}
       </p>
-      {!filtered && (
-        <Link
-          href="/requests/new"
+      {!filtered && onNewRequest && (
+        <button
+          onClick={onNewRequest}
           className="mt-4 inline-flex items-center px-4 py-2 bg-brand-primary text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity"
         >
           New request
-        </Link>
+        </button>
       )}
     </div>
   )
@@ -102,6 +103,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
   const [type, setType] = useState<RequestType | 'all'>('all')
   const [filterCustomerId, setFilterCustomerId] = useState('')
   const [page, setPage] = useState(0)
+  const [showNewRequest, setShowNewRequest] = useState(false)
 
   const isFiltered = status !== 'all' || type !== 'all' || !!filterCustomerId
 
@@ -154,7 +156,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
         </div>
         <div className="flex-1 hidden sm:block" />
         <select
-          className={NATIVE_SELECT_CLS}
+          className={`${NATIVE_SELECT_CLS} hidden sm:inline-flex`}
           value={type}
           onChange={e => { setType(e.target.value as RequestType | 'all'); setPage(0) }}
         >
@@ -165,7 +167,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
         </select>
         {isAdminOrCompany && !customerId && (
           <select
-            className={NATIVE_SELECT_CLS}
+            className={`${NATIVE_SELECT_CLS} hidden sm:inline-flex`}
             value={filterCustomerId}
             onChange={e => { setFilterCustomerId(e.target.value); setPage(0) }}
           >
@@ -178,18 +180,18 @@ export function RequestListView({ customerId }: { customerId?: string }) {
       </div>
 
       {/* Desktop table */}
-      <div className="hidden sm:block border border-border rounded-xl overflow-hidden">
+      <div className="hidden sm:block bg-surface border border-border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-bg-secondary border-b border-border">
             <tr>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Type</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Type</th>
               {hasCustomerCol && (
-                <th className="px-4 py-3 text-left text-text-secondary font-medium">Customer</th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Customer</th>
               )}
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Author</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Status</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Fee</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Created</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Author</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Fee</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Created</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -198,7 +200,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
             {!isLoading && data?.content.length === 0 && (
               <tr>
                 <td colSpan={colCount}>
-                  <EmptyState filtered={isFiltered} />
+                  <EmptyState filtered={isFiltered} onNewRequest={() => setShowNewRequest(true)} />
                 </td>
               </tr>
             )}
@@ -257,7 +259,7 @@ export function RequestListView({ customerId }: { customerId?: string }) {
           </div>
         ))}
         {!isLoading && data?.content.length === 0 && (
-          <EmptyState filtered={isFiltered} />
+          <EmptyState filtered={isFiltered} onNewRequest={() => setShowNewRequest(true)} />
         )}
         {data?.content.map(req => (
           <Link key={req.id} href={`/requests/${req.id}`}>
@@ -277,6 +279,12 @@ export function RequestListView({ customerId }: { customerId?: string }) {
           </Link>
         ))}
       </div>
+
+      <NewRequestModal
+        open={showNewRequest}
+        onOpenChange={setShowNewRequest}
+        initialCustomerId={customerId}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
