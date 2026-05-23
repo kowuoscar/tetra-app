@@ -98,7 +98,9 @@ CREATE TABLE invoices (
     total                       NUMERIC(10,2) NOT NULL DEFAULT 0,
     status                      VARCHAR NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','sent','paid')),
     pdf_storage_key             VARCHAR,
-    created_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at                     TIMESTAMP,
+    paid_at                     TIMESTAMP
 );
 
 CREATE TABLE sim_monthly_billing (
@@ -116,5 +118,6 @@ CREATE TABLE system_settings (
     bank_swift                  VARCHAR,
     company_name                VARCHAR,
     company_address             VARCHAR,
-    company_whatsapp_group_id   VARCHAR
+    company_whatsapp_group_id   VARCHAR,
+    updated_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

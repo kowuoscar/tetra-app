@@ -1,5 +1,6 @@
 package com.tetramobile.tetra.shared.exception;
 
+import com.tetramobile.tetra.invoice.InvoicePdfException;
 import com.tetramobile.tetra.storage.StorageException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -83,6 +84,13 @@ public class GlobalExceptionHandler {
         log.error("Storage error", ex);
         return ResponseEntity.status(502)
                 .body(ErrorResponse.of("storage_error", "File storage unavailable"));
+    }
+
+    @ExceptionHandler(InvoicePdfException.class)
+    public ResponseEntity<ErrorResponse> handleInvoicePdf(InvoicePdfException ex) {
+        log.error("Invoice PDF generation error", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of("pdf_generation_error", "Failed to generate invoice PDF"));
     }
 
     @ExceptionHandler(Exception.class)
