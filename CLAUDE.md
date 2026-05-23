@@ -6,9 +6,9 @@
 
 ## Current plan
 
-**Active:** `plans/plan-02p-customer-asset-improvements.md`
-**Status:** In progress
-**Previous:** `plans/plan-02-customers-assets.md` — Complete
+**Active:** `plans/plan-04-billing-invoices.md`
+**Status:** Not started
+**Previous:** `plans/plan-03-requests.md` — Complete
 
 Update this section at the start of each plan. It is the first thing every agent session reads.
 

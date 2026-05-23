@@ -121,3 +121,27 @@ export type CostBreakdown = {
   request_fees: Array<{ request_id: string; request_type: string; amount: number }>
   total: number
 }
+
+export type InvoiceStatus = 'draft' | 'sent' | 'paid'
+
+export type InvoiceSummary = {
+  id: string
+  invoice_number: number
+  period_month: number
+  period_year: number
+  status: InvoiceStatus
+  total: number
+  created_at: string
+  sent_at: string | null
+  paid_at: string | null
+}
+
+export type InvoiceDetail = InvoiceSummary & {
+  support_fees: number
+  support_expenses: number
+  rolling_advance_current: number
+  rolling_advance_previous: number
+  previous_balance: number
+  taxes: number
+  pdf_available: boolean
+}
