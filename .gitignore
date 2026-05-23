@@ -8,3 +8,10 @@ web/.env.local
 
 # macOS
 .DS_Store
+
+# IDE
+.idea/
+
+# Claude Code
+.ai/
+.claude/
