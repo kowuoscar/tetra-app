@@ -39,14 +39,54 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3.5">
+      {/* Desktop section header */}
+      <div className="hidden sm:flex items-center justify-between mb-3.5">
         <span className="text-sm font-semibold text-text-primary">SIM Cards</span>
         {isAdmin && (
           <Button size="sm" onClick={() => setShowCreate(true)}>+ Add SIM</Button>
         )}
       </div>
 
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      {/* Mobile cards */}
+      <div className="sm:hidden flex flex-col gap-2">
+        {data?.sim_cards.length === 0 ? (
+          <p className="text-text-secondary text-sm py-4">No SIM cards assigned.</p>
+        ) : (
+          data?.sim_cards.map((sim) => (
+            <div
+              key={sim.id}
+              className={`bg-surface border rounded-xl p-3.5 ${
+                sim.is_unused ? 'border-status-warning' : 'border-border'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-[13px] font-semibold text-text-primary capitalize">{sim.type}</div>
+                  <div className="text-xs text-text-secondary mt-0.5">
+                    {[
+                      sim.provider ? sim.provider.charAt(0) + sim.provider.slice(1).toLowerCase() : null,
+                      sim.number ?? null,
+                    ].filter(Boolean).join(' · ') || '—'}
+                  </div>
+                </div>
+                <StatusBadge variant={statusVariant(sim.status)}>
+                  {sim.status.replace('_', ' ')}
+                </StatusBadge>
+              </div>
+              <div className="mt-2 text-xs">
+                {sim.is_unused ? (
+                  <span className="text-status-warning">⚠ No phone assigned</span>
+                ) : sim.type === 'postpaid' ? (
+                  <span className="text-text-secondary">{`€${sim.base_monthly_fee.toFixed(2)}/mo`}</span>
+                ) : null}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block bg-surface border border-border rounded-lg overflow-hidden">
         {data?.sim_cards.length === 0 ? (
           <p className="text-text-secondary text-sm p-4">No SIM cards assigned.</p>
         ) : (
@@ -98,7 +138,7 @@ export function CustomerSimCardsTab({ customerId }: { customerId: string }) {
                   </td>
                   <td className={TD}>
                     {sim.is_unused ? (
-                      <StatusBadge variant="warning">No phone</StatusBadge>
+                      <StatusBadge variant="warning">⚠ No phone assigned</StatusBadge>
                     ) : (
                       <span className="text-text-secondary">—</span>
                     )}
@@ -181,9 +221,15 @@ function CreateSimCardModal({
   onCreated: () => void
 }) {
   const [simType, setSimType] = useState('prepaid')
-  const [provider, setProvider] = useState('FREE')
+  const [provider, setProvider] = useState('')
+  const [selectedPhoneId, setSelectedPhoneId] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const { data: phonesData } = useQuery({
+    queryKey: ['phones', customerId],
+    queryFn: () => getCustomerPhones(customerId),
+  })
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -191,14 +237,13 @@ function CreateSimCardModal({
     setError(null)
     const formData = new FormData(e.currentTarget)
     const feeRaw = formData.get('base_monthly_fee') as string
-    const phoneId = (formData.get('phone_id') as string).trim() || undefined
     const number = formData.get('number') as string
 
     try {
       await createSimCard(customerId, {
         type: simType,
         base_monthly_fee: simType === 'prepaid' ? 0 : parseFloat(feeRaw),
-        phone_id: phoneId,
+        phone_id: selectedPhoneId || undefined,
         provider,
         number,
       })
@@ -211,81 +256,123 @@ function CreateSimCardModal({
 
   return (
     <Dialog open onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-6 py-5 border-b border-border">
           <DialogTitle>Add SIM Card</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="sim_type">Type</Label>
-            <select
-              id="sim_type"
-              value={simType}
-              onChange={(e) => setSimType(e.target.value)}
-              disabled={submitting}
-              className={NATIVE_SELECT_CLS}
-            >
-              <option value="prepaid">Prepaid</option>
-              <option value="postpaid">Postpaid</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="sim_provider">Provider</Label>
-            <select
-              id="sim_provider"
-              value={provider}
-              onChange={(e) => setProvider(e.target.value)}
-              disabled={submitting}
-              className={NATIVE_SELECT_CLS}
-            >
-              <option value="FREE">Free</option>
-              <option value="ORANGE">Orange</option>
-              <option value="BOUYGUES">Bouygues</option>
-              <option value="SFR">SFR</option>
-              <option value="CORIOLIS">Coriolis</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="number">Phone number</Label>
-            <Input
-              id="number"
-              name="number"
-              placeholder="06 or 07 French mobile number"
-              pattern="^(\+33|0033|0)[67]\d{8}$"
-              required
-              disabled={submitting}
-            />
-          </div>
-          {simType === 'postpaid' && (
+        <form onSubmit={handleSubmit}>
+          <div className="px-6 py-6 space-y-4">
+            {error && (
+              <div className="flex items-start gap-2.5 bg-status-errorBg border border-status-error/20 text-status-error rounded-lg px-4 py-3 text-sm">
+                <svg className="shrink-0 mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                {error}
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1.5">
+                <Label htmlFor="sim_type">
+                  Type <span className="text-status-error">*</span>
+                </Label>
+                <select
+                  id="sim_type"
+                  value={simType}
+                  onChange={(e) => setSimType(e.target.value)}
+                  required
+                  disabled={submitting}
+                  className={NATIVE_SELECT_CLS}
+                >
+                  <option value="prepaid">Prepaid</option>
+                  <option value="postpaid">Postpaid</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="sim_provider">
+                  Provider <span className="text-status-error">*</span>
+                </Label>
+                <select
+                  id="sim_provider"
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  required
+                  disabled={submitting}
+                  className={NATIVE_SELECT_CLS}
+                >
+                  <option value="" disabled>Select provider…</option>
+                  <option value="FREE">Free</option>
+                  <option value="ORANGE">Orange</option>
+                  <option value="BOUYGUES">Bouygues</option>
+                  <option value="SFR">SFR</option>
+                  <option value="CORIOLIS">Coriolis</option>
+                </select>
+              </div>
+            </div>
             <div className="space-y-1.5">
-              <Label htmlFor="base_monthly_fee">Base monthly fee (€)</Label>
+              <Label htmlFor="number">
+                Mobile number <span className="text-status-error">*</span>
+              </Label>
               <Input
-                id="base_monthly_fee"
-                name="base_monthly_fee"
-                type="number"
-                step="0.01"
-                min="0"
+                id="number"
+                name="number"
+                type="tel"
+                placeholder="07 XX XX XX XX"
+                pattern="^(\+33|0033|0)[67]\d{8}$"
                 required
                 disabled={submitting}
+                className="font-mono"
               />
+              <p className="text-xs text-text-secondary">French mobile number (06 / 07 prefix)</p>
             </div>
-          )}
-          <div className="space-y-1.5">
-            <Label htmlFor="phone_id">Phone ID <span className="text-text-secondary font-normal">(optional)</span></Label>
-            <Input
-              id="phone_id"
-              name="phone_id"
-              placeholder="UUID of phone to assign"
-              disabled={submitting}
-            />
+            {simType === 'prepaid' && (
+              <div className="flex items-center gap-2 px-3 py-3 bg-bg-tertiary rounded-md text-xs text-text-secondary">
+                <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Prepaid SIMs have no monthly fee. €0.00 will be recorded automatically.
+              </div>
+            )}
+            {simType === 'postpaid' && (
+              <div className="space-y-1.5">
+                <Label htmlFor="base_monthly_fee">Base monthly fee (€)</Label>
+                <Input
+                  id="base_monthly_fee"
+                  name="base_monthly_fee"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  required
+                  disabled={submitting}
+                />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="phone_assign">
+                Assign to phone{' '}
+                <span className="text-text-disabled font-normal">(optional)</span>
+              </Label>
+              <select
+                id="phone_assign"
+                value={selectedPhoneId}
+                onChange={(e) => setSelectedPhoneId(e.target.value)}
+                disabled={submitting}
+                className={NATIVE_SELECT_CLS}
+              >
+                <option value="">Not assigned</option>
+                {(phonesData?.phones ?? []).map((phone) => (
+                  <option key={phone.id} value={phone.id}>
+                    {phone.model} ({phone.ownership})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          {error && <p className="text-status-error text-sm">{error}</p>}
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+          <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-bg-secondary">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={submitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Adding…' : 'Add'}
+              {submitting ? 'Adding…' : 'Add SIM Card'}
             </Button>
           </div>
         </form>

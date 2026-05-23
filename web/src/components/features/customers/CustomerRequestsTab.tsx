@@ -81,14 +81,14 @@ export function CustomerRequestsTab({ customerId, doneOnly }: Props) {
   return (
     <div className="space-y-2">
       {/* Desktop table */}
-      <div className="hidden sm:block border border-border rounded-xl overflow-hidden text-sm">
+      <div className="hidden sm:block bg-surface border border-border rounded-xl overflow-hidden text-sm">
         <table className="w-full">
           <thead className="bg-bg-secondary border-b border-border">
             <tr>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Type</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Status</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Fee</th>
-              <th className="px-4 py-3 text-left text-text-secondary font-medium">Date</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Type</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Fee</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Date</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>

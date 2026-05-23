@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useRef, useState, Fragment } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getRequest, updateRequest, addPart, deletePart, uploadAttachment, downloadAttachment } from '@/lib/data/requests'
 import { useAuthStore } from '@/lib/stores/authStore'
@@ -20,9 +20,9 @@ const STATUS_LABELS: Record<RequestStatus, string> = {
 }
 
 const STATUS_BADGE: Record<RequestStatus, string> = {
-  submitted: 'bg-status-info/10 text-status-info border-status-info/30',
-  in_progress: 'bg-status-warning/10 text-status-warning border-status-warning/30',
-  done: 'bg-status-success/10 text-status-success border-status-success/30',
+  submitted: 'bg-status-info-bg text-status-info',
+  in_progress: 'bg-status-warning-bg text-status-warning',
+  done: 'bg-status-success-bg text-status-success',
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -36,16 +36,27 @@ const TYPE_LABELS: Record<string, string> = {
 
 const STEP_ORDER: RequestStatus[] = ['submitted', 'in_progress', 'done']
 
+function formatRelativeDate(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime()
+  const days = Math.floor(diffMs / 86400000)
+  const hours = Math.floor(diffMs / 3600000)
+  const mins = Math.floor(diffMs / 60000)
+  if (days > 0) return `${days} day${days === 1 ? '' : 's'} ago`
+  if (hours > 0) return `${hours} hour${hours === 1 ? '' : 's'} ago`
+  if (mins > 0) return `${mins} minute${mins === 1 ? '' : 's'} ago`
+  return 'just now'
+}
+
 function StatusStepper({ status }: { status: RequestStatus }) {
   const current = STEP_ORDER.indexOf(status)
   return (
-    <div className="flex items-center">
+    <div className="flex items-center w-full">
       {STEP_ORDER.map((s, i) => {
         const isPast = i < current
         const isActive = i === current
         return (
-          <div key={s} className="flex items-center">
-            <div className="flex items-center gap-2">
+          <Fragment key={s}>
+            <div className="flex items-center gap-2 shrink-0">
               <div
                 className={[
                   'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0',
@@ -70,7 +81,7 @@ function StatusStepper({ status }: { status: RequestStatus }) {
             {i < STEP_ORDER.length - 1 && (
               <div className={['flex-1 h-px mx-3 min-w-5', isPast ? 'bg-status-success' : 'bg-border'].join(' ')} />
             )}
-          </div>
+          </Fragment>
         )
       })}
     </div>
@@ -137,12 +148,12 @@ export function RequestDetailView({ requestId }: Props) {
 
   if (isLoading || !req) {
     return (
-      <div className="space-y-5 max-w-5xl animate-pulse">
+      <div className="space-y-5 animate-pulse">
         <div className="bg-surface border border-border rounded-xl px-6 py-5 space-y-3">
           <div className="h-5 bg-bg-secondary rounded w-40" />
           <div className="h-4 bg-bg-secondary rounded w-64" />
         </div>
-        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[3fr_2fr]">
           <div className="space-y-4">
             <div className="bg-surface border border-border rounded-xl p-5 h-24" />
             <div className="bg-surface border border-border rounded-xl p-5 h-40" />
@@ -166,7 +177,7 @@ export function RequestDetailView({ requestId }: Props) {
   const totalPartsAmount = req.parts.reduce((sum, p) => sum + p.cost, 0)
 
   return (
-    <div className="space-y-5 max-w-5xl">
+    <div className="space-y-5">
       {error && (
         <p className="text-sm text-status-error bg-status-error/5 border border-status-error/20 rounded-lg px-4 py-2">
           {error}
@@ -176,29 +187,24 @@ export function RequestDetailView({ requestId }: Props) {
       {/* Header card */}
       <div className="bg-surface border border-border rounded-xl px-6 py-5 flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5 mb-1.5">
+          <div className="flex items-center gap-3 mb-1.5">
             <h1 className="text-lg font-bold text-text-primary">{TYPE_LABELS[req.type] ?? req.type}</h1>
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${STATUS_BADGE[req.status]}`}>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[req.status]}`}>
               {STATUS_LABELS[req.status]}
             </span>
           </div>
-          <div className="flex flex-wrap gap-3 text-sm text-text-secondary">
+          {/* Desktop metadata */}
+          <div className="hidden sm:flex flex-wrap gap-4 text-sm text-text-secondary">
             <span>{req.customer_name}</span>
-            {req.phone_id && <span className="text-text-disabled">·</span>}
-            <span className="capitalize">by {req.author}</span>
-            <span className="text-text-disabled">·</span>
-            <span>{new Date(req.created_at).toLocaleDateString()}</span>
+            <span>by {req.author.charAt(0).toUpperCase() + req.author.slice(1)} · {formatRelativeDate(req.created_at)}</span>
             {req.time_spent_minutes != null && isAdmin && (
-              <>
-                <span className="text-text-disabled">·</span>
-                <span className="text-text-disabled">Time: {formatTimeSpent(req.time_spent_minutes)}</span>
-              </>
+              <span className="text-text-disabled">Time: {formatTimeSpent(req.time_spent_minutes)}</span>
             )}
           </div>
         </div>
 
         {isAdminOrCompany && req.status !== 'done' && availableNextStatuses.length > 0 && (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <select
               className={`${NATIVE_SELECT_CLS} w-40`}
               value={effectivePending}
@@ -227,12 +233,40 @@ export function RequestDetailView({ requestId }: Props) {
         </div>
       )}
 
+      {/* Mobile detail card */}
+      <div className="sm:hidden bg-surface border border-border rounded-xl px-4 py-3.5 space-y-1.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-text-secondary">Customer</span>
+          <span className="text-text-primary font-medium">{req.customer_name}</span>
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-text-secondary">Author</span>
+          <span className="text-text-primary font-medium">{req.author.charAt(0).toUpperCase() + req.author.slice(1)}</span>
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-text-secondary">Created</span>
+          <span className="text-text-primary font-medium">{formatRelativeDate(req.created_at)}</span>
+        </div>
+        {req.phone_id != null && (
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-text-secondary">Phone</span>
+            <span className="text-text-primary font-medium">—</span>
+          </div>
+        )}
+        {req.time_spent_minutes != null && isAdmin && (
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-text-secondary">Time</span>
+            <span className="text-text-primary font-medium">{formatTimeSpent(req.time_spent_minutes)}</span>
+          </div>
+        )}
+      </div>
+
       {/* Two-column grid */}
-      <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 340px' }}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[3fr_2fr]">
         {/* Left column */}
         <div className="space-y-4">
-          {/* Status stepper */}
-          <div className="bg-surface border border-border rounded-xl p-5">
+          {/* Status stepper — desktop only */}
+          <div className="hidden sm:block bg-surface border border-border rounded-xl p-5">
             <p className="text-sm font-semibold text-text-primary mb-4">Status</p>
             <StatusStepper status={req.status} />
           </div>
@@ -240,14 +274,14 @@ export function RequestDetailView({ requestId }: Props) {
           {/* Parts & materials */}
           <div className="bg-surface border border-border rounded-xl overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
-              <span className="text-sm font-semibold text-text-primary">Parts &amp; materials</span>
+              <span className="text-sm font-semibold text-text-primary">
+                <span className="hidden sm:inline">Parts &amp; materials</span>
+                <span className="sm:hidden">Parts</span>
+              </span>
               {isAdminOrCompany && req.status !== 'done' && (
-                <button
-                  onClick={() => setAddingPart(true)}
-                  className="text-xs font-medium text-brand-primary hover:underline"
-                >
+                <Button variant="outline" size="sm" onClick={() => setAddingPart(true)}>
                   + Add part
-                </button>
+                </Button>
               )}
             </div>
             {req.parts.length > 0 ? (
@@ -266,12 +300,14 @@ export function RequestDetailView({ requestId }: Props) {
                       <td className="px-5 py-3 font-mono text-text-primary">€{p.cost.toFixed(2)}</td>
                       <td className="px-3 py-3">
                         {isAdminOrCompany && req.status !== 'done' && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-status-error hover:bg-status-error/5 h-auto px-2 py-1 text-xs"
                             onClick={() => deletePartMutation.mutate(p.id)}
-                            className="text-xs text-status-error hover:underline px-2 py-1 rounded hover:bg-status-error/5 transition-colors"
                           >
                             Remove
-                          </button>
+                          </Button>
                         )}
                       </td>
                     </tr>
@@ -387,24 +423,33 @@ export function RequestDetailView({ requestId }: Props) {
           <div className="bg-surface border border-border rounded-xl overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border">
               <span className="text-sm font-semibold text-text-primary">
-                Attachments{req.attachments.length > 0 ? ` (${req.attachments.length})` : ''}
+                Attachments
+                {req.attachments.length > 0 && (
+                  <span className="sm:hidden"> ({req.attachments.length})</span>
+                )}
               </span>
             </div>
             <div className="p-4 space-y-3">
-              {req.attachments.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {req.attachments.map(a => (
-                    <button
-                      key={a.id}
-                      onClick={() => downloadAttachment(requestId, a.id)}
-                      className="aspect-square rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-xs font-mono font-medium text-text-secondary hover:border-brand-primary hover:text-brand-primary transition-colors"
-                      title={`Uploaded ${new Date(a.created_at).toLocaleDateString()}`}
-                    >
-                      IMG
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-3 gap-2">
+                {req.attachments.map(a => (
+                  <button
+                    key={a.id}
+                    onClick={() => downloadAttachment(requestId, a.id)}
+                    className="aspect-square rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-xs font-mono font-medium text-text-secondary hover:border-brand-primary hover:text-brand-primary transition-colors"
+                    title={`Uploaded ${new Date(a.created_at).toLocaleDateString()}`}
+                  >
+                    IMG
+                  </button>
+                ))}
+                <button
+                  className="sm:hidden aspect-square rounded-lg border-2 border-dashed border-brand-primary/30 bg-brand-secondary/30 flex items-center justify-center text-xs font-medium text-brand-primary disabled:opacity-50"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  aria-label="Add photo"
+                >
+                  {uploading ? '…' : '+ Add'}
+                </button>
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -413,14 +458,16 @@ export function RequestDetailView({ requestId }: Props) {
                 onChange={handleFileUpload}
                 disabled={uploading}
               />
-              <button
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden sm:flex w-full justify-center gap-1.5"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary hover:bg-bg-secondary transition-colors disabled:opacity-50"
               >
                 {uploading ? 'Uploading…' : '+ Upload photo'}
-              </button>
-              <p className="text-xs text-text-disabled text-center">JPEG, PNG, WebP · max 10 MB</p>
+              </Button>
+              <p className="hidden sm:block text-xs text-text-disabled text-center">JPEG, PNG, WebP · max 10 MB</p>
             </div>
           </div>
         </div>

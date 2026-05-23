@@ -40,14 +40,55 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3.5">
+      {/* Desktop section header */}
+      <div className="hidden sm:flex items-center justify-between mb-3.5">
         <span className="text-sm font-semibold text-text-primary">Phones</span>
         {isAdmin && (
           <Button size="sm" onClick={() => setShowCreate(true)}>+ Add phone</Button>
         )}
       </div>
 
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      {/* Mobile cards */}
+      <div className="sm:hidden flex flex-col gap-2">
+        {data?.phones.length === 0 ? (
+          <p className="text-text-secondary text-sm py-4">No phones assigned.</p>
+        ) : (
+          data?.phones.map((phone) => (
+            <div
+              key={phone.id}
+              className={`bg-surface border rounded-xl p-3.5 ${
+                phone.is_unused ? 'border-status-warning' : 'border-border'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-[13px] font-semibold text-text-primary">{phone.model}</div>
+                  <div className="text-xs text-text-secondary mt-0.5 capitalize">
+                    {phone.ownership}-owned
+                  </div>
+                </div>
+                <StatusBadge variant={statusVariant(phone.status)}>
+                  {phone.status.replace('_', ' ')}
+                </StatusBadge>
+              </div>
+              <div className="mt-2 text-xs">
+                {phone.sim_card ? (
+                  <span className="text-text-secondary">
+                    {`SIM: ${phone.sim_card.type.charAt(0).toUpperCase() + phone.sim_card.type.slice(1)}${phone.sim_card.type === 'postpaid' ? ` · €${phone.sim_card.base_monthly_fee.toFixed(2)}/mo` : ''}`}
+                  </span>
+                ) : phone.is_unused ? (
+                  <span className="text-status-warning">⚠ No SIM assigned</span>
+                ) : (
+                  <span className="text-text-secondary">No SIM assigned</span>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block bg-surface border border-border rounded-lg overflow-hidden">
         {data?.phones.length === 0 ? (
           <p className="text-text-secondary text-sm p-4">No phones assigned.</p>
         ) : (
@@ -92,7 +133,7 @@ export function CustomerPhonesTab({ customerId }: { customerId: string }) {
                   </td>
                   <td className={TD}>
                     {phone.is_unused ? (
-                      <StatusBadge variant="warning">No SIM</StatusBadge>
+                      <StatusBadge variant="warning">⚠ No SIM assigned</StatusBadge>
                     ) : (
                       <span className="text-text-secondary">—</span>
                     )}
@@ -218,35 +259,48 @@ function CreatePhoneModal({
 
   return (
     <Dialog open onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
+      <DialogContent className="max-w-sm p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-6 py-5 border-b border-border">
           <DialogTitle>Add Phone</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="model">Model</Label>
-            <Input id="model" name="model" required disabled={submitting} />
+        <form onSubmit={handleSubmit}>
+          <div className="px-6 py-6 space-y-4">
+            {error && (
+              <div className="flex items-start gap-2.5 bg-status-errorBg border border-status-error/20 text-status-error rounded-lg px-4 py-3 text-sm">
+                <svg className="shrink-0 mt-0.5" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                {error}
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="model">
+                Model <span className="text-status-error">*</span>
+              </Label>
+              <Input id="model" name="model" required disabled={submitting} placeholder="e.g. iPhone 15 Pro" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ownership">
+                Ownership <span className="text-status-error">*</span>
+              </Label>
+              <select
+                id="ownership"
+                value={ownership}
+                onChange={(e) => setOwnership(e.target.value)}
+                disabled={submitting}
+                className={NATIVE_SELECT_CLS}
+              >
+                <option value="customer">Customer</option>
+                <option value="company">Company</option>
+              </select>
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="ownership">Ownership</Label>
-            <select
-              id="ownership"
-              value={ownership}
-              onChange={(e) => setOwnership(e.target.value)}
-              disabled={submitting}
-              className={NATIVE_SELECT_CLS}
-            >
-              <option value="customer">Customer</option>
-              <option value="company">Company</option>
-            </select>
-          </div>
-          {error && <p className="text-status-error text-sm">{error}</p>}
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+          <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-bg-secondary">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={submitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Adding…' : 'Add'}
+              {submitting ? 'Adding…' : 'Add Phone'}
             </Button>
           </div>
         </form>
