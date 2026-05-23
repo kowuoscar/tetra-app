@@ -110,7 +110,7 @@ describe('CustomerPhonesTab — mobile card view', () => {
 
   it('mobile card shows SIM info when sim_card present', async () => {
     mockGetCustomerPhones.mockResolvedValue({ phones: [makePhone({
-      sim_card: { id: 's1', type: 'postpaid', provider: 'BOUYGUES', number: '0612345678', base_monthly_fee: 89, status: 'active', phone_id: 'p1', customer_id: 'c1', created_at: '' },
+      sim_card: { id: 's1', type: 'postpaid', provider: 'BOUYGUES', number: '0612345678', base_monthly_fee: 89 },
     })] })
     render(<CustomerPhonesTab customerId="c1" />, { wrapper })
     await screen.findAllByText('iPhone 15 Pro')
