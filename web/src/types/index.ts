@@ -15,6 +15,12 @@ export type DashboardStats = {
   total_phones: number
   total_sim_cards: number
   open_requests: number
+  new_customers_this_month: number
+  phones_in_repair: number
+  unassigned_sim_cards: number
+  submitted_requests: number
+  in_progress_requests: number
+  phones_without_sim: number
 }
 
 export type CustomerSummary = {

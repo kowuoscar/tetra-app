@@ -200,7 +200,13 @@ class CustomerListIT {
                 .andExpect(jsonPath("$.total_customers").isNumber())
                 .andExpect(jsonPath("$.total_phones").isNumber())
                 .andExpect(jsonPath("$.total_sim_cards").isNumber())
-                .andExpect(jsonPath("$.open_requests").isNumber());
+                .andExpect(jsonPath("$.open_requests").isNumber())
+                .andExpect(jsonPath("$.new_customers_this_month").isNumber())
+                .andExpect(jsonPath("$.phones_in_repair").isNumber())
+                .andExpect(jsonPath("$.unassigned_sim_cards").isNumber())
+                .andExpect(jsonPath("$.submitted_requests").isNumber())
+                .andExpect(jsonPath("$.in_progress_requests").isNumber())
+                .andExpect(jsonPath("$.phones_without_sim").isNumber());
     }
 
     @Test
